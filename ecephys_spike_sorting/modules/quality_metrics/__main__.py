@@ -117,7 +117,7 @@ def calculate_quality_metrics(args):
 
         print("Launching multiprocessing pool...")
         with multiprocessing.Pool(processes=4, initializer=initializer, initargs=initargs) as pool:
-            results = pool.starmap(worker, zip(clusterIDs[:10], [args['quality_metrics_params']] * 10)) # clusterIDs.size))
+            results = pool.starmap(worker, zip(clusterIDs, [args['quality_metrics_params']] * clusterIDs.size))
 
         metrics = pd.concat(results, ignore_index=True)
 
