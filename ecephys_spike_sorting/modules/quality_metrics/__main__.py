@@ -3,11 +3,14 @@ import os
 import logging
 import time
 import multiprocessing
+import ctypes
+import sys
+import gc
 
 import numpy as np
 import pandas as pd
 
-from ...common.utils import load_kilosort_data, get_spike_depths
+from ...common.utils import load_kilosort_data, get_spike_depths, printProgressBar
 from ...common.epoch import get_epochs_from_nwb_file
 
 from .metrics_parallel import calculate_metrics
@@ -15,32 +18,25 @@ from .metrics_parallel import calculate_metrics
 def unpack_data(*args):
 
     global spike_times_
-    spike_times_ = np.ctypeslib.as_array(args[0][0].get_obj())
-    spike_times_.reshape(args[0][1])
+    spike_times_ = np.ctypeslib.as_array(args[0][0].get_obj()).reshape(args[0][1])
     
     global spike_clusters_
-    spike_clusters_ = np.ctypeslib.as_array(args[1][0].get_obj())
-    spike_clusters_.reshape(args[1][1])
+    spike_clusters_ = np.ctypeslib.as_array(args[1][0].get_obj()).reshape(args[1][1])
     
     global amplitudes_
-    amplitudes_ = np.ctypeslib.as_array(args[2][0].get_obj())
-    amplitudes_.reshape(args[2][1])
+    amplitudes_ = np.ctypeslib.as_array(args[2][0].get_obj()).reshape(args[2][1])
 
     global channel_map_
-    channel_map_ = np.ctypeslib.as_array(args[3][0].get_obj())
-    channel_map_.reshape(args[3][1])
+    channel_map_ = np.ctypeslib.as_array(args[3][0].get_obj()).reshape(args[3][1])
 
     global pc_features_
-    pc_features_ = np.ctypeslib.as_array(args[4][0].get_obj())
-    pc_features_.reshape(args[4][1])
+    pc_features_ = np.ctypeslib.as_array(args[4][0].get_obj()).reshape(args[4][1])
 
     global pc_feature_ind_
-    pc_feature_ind_ = np.ctypeslib.as_array(args[5][0].get_obj())
-    pc_feature_ind_.reshape(args[5][1])
+    pc_feature_ind_ = np.ctypeslib.as_array(args[5][0].get_obj()).reshape(args[5][1])
 
     global spike_depths_
-    spike_depths_ = np.ctypeslib.as_array(args[6][0].get_obj())
-    spike_depths_.reshape(args[6][1])
+    spike_depths_ = np.ctypeslib.as_array(args[6][0].get_obj()).reshape(args[6][1])
 
     global counter
     counter = args[7]
@@ -62,13 +58,8 @@ def create_shared_array(arr):
     return shared_array_base, arr.shape
 
 def worker(cluster_id, params):
-    
-    with counter.get_lock():
-        counter.value += 1
-        printProgressBar(counter + 1, np.max(spike_clusters_))
-        sys.stdout.flush()
 
-    return calculate_metrics(cluster_id,
+    df = calculate_metrics(cluster_id,
                              spike_times_, 
                              spike_clusters_, 
                              amplitudes_, 
@@ -77,6 +68,13 @@ def worker(cluster_id, params):
                              pc_feature_ind_, 
                              spike_depths_,
                              params)
+
+    with counter.get_lock():
+        counter.value += 1
+        printProgressBar(counter.value + 1, np.max(spike_clusters_))
+        sys.stdout.flush()
+
+    return df
     
 
 def calculate_quality_metrics(args):
@@ -103,14 +101,20 @@ def calculate_quality_metrics(args):
                                                             pc_features,
                                                             pc_feature_ind,
                                                             spike_depths]) )
+        
+        del spike_times, spike_clusters, spike_templates, amplitudes, templates, channel_map, spike_depths
+        del pc_features, pc_feature_ind
+        gc.collect()
+
         counter = multiprocessing.Value('i',0)
 
-        initargs = shared_arrays + counter
+        initargs = shared_arrays + (counter,)
 
-        with Pool(processes=8, initializer=unpack_data, initargs=initargs) as pool:
-            results = pool.starmap(worker, zip(clusterIDs, [args['quality_metrics_params']] * clusterIDs.size))
+        print("Launching multiprocessing pool...")
+        with multiprocessing.Pool(processes=4, initializer=unpack_data, initargs=initargs) as pool:
+            results = pool.starmap(worker, zip(clusterIDs[:10], [args['quality_metrics_params']] * 10)) # clusterIDs.size))
 
-        # concatenate results
+        metrics = pd.concat(results, ignore_index=True)
 
     except FileNotFoundError:
         
@@ -149,7 +153,7 @@ def main():
 
     output = calculate_quality_metrics(mod.args)
 
-    multiprocessing.log_to_stderr(logging.ERROR)
+    multiprocessing.log_to_stderr(logging.DEBUG)
 
     output.update({"input_parameters": mod.args})
     if "output_json" in mod.args:
