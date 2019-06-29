@@ -2,15 +2,82 @@ from argschema import ArgSchemaParser
 import os
 import logging
 import time
+import multiprocessing
 
 import numpy as np
 import pandas as pd
 
-from ...common.utils import load_kilosort_data
+from ...common.utils import load_kilosort_data, get_spike_depths
 from ...common.epoch import get_epochs_from_nwb_file
 
-from .metrics import calculate_metrics
+from .metrics_parallel import calculate_metrics
 
+def unpack_data(*args):
+
+    global spike_times_
+    spike_times_ = np.ctypeslib.as_array(args[0][0].get_obj())
+    spike_times_.reshape(args[0][1])
+    
+    global spike_clusters_
+    spike_clusters_ = np.ctypeslib.as_array(args[1][0].get_obj())
+    spike_clusters_.reshape(args[1][1])
+    
+    global amplitudes_
+    amplitudes_ = np.ctypeslib.as_array(args[2][0].get_obj())
+    amplitudes_.reshape(args[2][1])
+
+    global channel_map_
+    channel_map_ = np.ctypeslib.as_array(args[3][0].get_obj())
+    channel_map_.reshape(args[3][1])
+
+    global pc_features_
+    pc_features_ = np.ctypeslib.as_array(args[4][0].get_obj())
+    pc_features_.reshape(args[4][1])
+
+    global pc_feature_ind_
+    pc_feature_ind_ = np.ctypeslib.as_array(args[5][0].get_obj())
+    pc_feature_ind_.reshape(args[5][1])
+
+    global spike_depths_
+    spike_depths_ = np.ctypeslib.as_array(args[6][0].get_obj())
+    spike_depths_.reshape(args[6][1])
+
+    global counter
+    counter = args[7]
+
+def create_shared_array(arr):
+
+    data_type = {np.dtype('uint32') : ctypes.c_uint32,
+                 np.dtype('int32') : ctypes.c_int32,
+                 np.dtype('uint64') : ctypes.c_uint64,
+                 np.dtype('int64') : ctypes.c_int64,
+                 np.dtype('float32') : ctypes.c_float,
+                 np.dtype('float64') : ctypes.c_double
+                 }[arr.dtype]
+    
+    shared_array_base = multiprocessing.Array(data_type, arr.size)
+    buffer = np.frombuffer(shared_array_base.get_obj(), dtype=arr.dtype).reshape(arr.shape)
+    np.copyto(buffer, arr)
+    
+    return shared_array_base, arr.shape
+
+def worker(cluster_id, params):
+    
+    with counter.get_lock():
+        counter.value += 1
+        printProgressBar(counter + 1, np.max(spike_clusters_))
+        sys.stdout.flush()
+
+    return calculate_metrics(cluster_id,
+                             spike_times_, 
+                             spike_clusters_, 
+                             amplitudes_, 
+                             channel_map_, 
+                             pc_features_, 
+                             pc_feature_ind_, 
+                             spike_depths_,
+                             params)
+    
 
 def calculate_quality_metrics(args):
 
@@ -27,8 +94,24 @@ def calculate_quality_metrics(args):
                     use_master_clock = False,
                     include_pcs = True)
 
-        metrics = calculate_metrics(spike_times, spike_clusters, amplitudes, channel_map, pc_features, pc_feature_ind, args['quality_metrics_params'])
-    
+        spike_depths = get_spike_depths(spike_clusters, pc_features, pc_feature_ind)
+        
+        shared_arrays = tuple( (create_shared_array(arr) for arr in [spike_times, 
+                                                            spike_clusters, 
+                                                            amplitudes,
+                                                            channel_map,
+                                                            pc_features,
+                                                            pc_feature_ind,
+                                                            spike_depths]) )
+        counter = multiprocessing.Value('i',0)
+
+        initargs = shared_arrays + counter
+
+        with Pool(processes=8, initializer=unpack_data, initargs=initargs) as pool:
+            results = pool.starmap(worker, zip(clusterIDs, [args['quality_metrics_params']] * clusterIDs.size))
+
+        # concatenate results
+
     except FileNotFoundError:
         
         execution_time = time.time() - start
@@ -65,6 +148,8 @@ def main():
                           output_schema_type=OutputParameters)
 
     output = calculate_quality_metrics(mod.args)
+
+    multiprocessing.log_to_stderr(logging.ERROR)
 
     output.update({"input_parameters": mod.args})
     if "output_json" in mod.args:
