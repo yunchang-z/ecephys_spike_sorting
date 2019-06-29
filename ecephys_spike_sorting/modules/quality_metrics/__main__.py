@@ -15,28 +15,33 @@ from ...common.epoch import get_epochs_from_nwb_file
 
 from .metrics_parallel import calculate_metrics
 
-def unpack_data(*args):
+
+def unpack_data(input_tuple):
+
+    return np.ctypeslib.as_array(input_tuple[0].get_obj()).reshape(input_tuple[1])
+
+def initializer(*args):
 
     global spike_times_
-    spike_times_ = np.ctypeslib.as_array(args[0][0].get_obj()).reshape(args[0][1])
+    spike_times_ = unpack_data(args[0])
     
     global spike_clusters_
-    spike_clusters_ = np.ctypeslib.as_array(args[1][0].get_obj()).reshape(args[1][1])
+    spike_clusters_ = unpack_data(args[1])
     
     global amplitudes_
-    amplitudes_ = np.ctypeslib.as_array(args[2][0].get_obj()).reshape(args[2][1])
+    amplitudes_ = unpack_data(args[2])
 
     global channel_map_
-    channel_map_ = np.ctypeslib.as_array(args[3][0].get_obj()).reshape(args[3][1])
+    channel_map_ = unpack_data(args[3])
 
     global pc_features_
-    pc_features_ = np.ctypeslib.as_array(args[4][0].get_obj()).reshape(args[4][1])
+    pc_features_ = unpack_data(args[4])
 
     global pc_feature_ind_
-    pc_feature_ind_ = np.ctypeslib.as_array(args[5][0].get_obj()).reshape(args[5][1])
+    pc_feature_ind_ = unpack_data(args[5])
 
     global spike_depths_
-    spike_depths_ = np.ctypeslib.as_array(args[6][0].get_obj()).reshape(args[6][1])
+    spike_depths_ = unpack_data(args[6])
 
     global counter
     counter = args[7]
@@ -111,7 +116,7 @@ def calculate_quality_metrics(args):
         initargs = shared_arrays + (counter,)
 
         print("Launching multiprocessing pool...")
-        with multiprocessing.Pool(processes=4, initializer=unpack_data, initargs=initargs) as pool:
+        with multiprocessing.Pool(processes=4, initializer=initializer, initargs=initargs) as pool:
             results = pool.starmap(worker, zip(clusterIDs[:10], [args['quality_metrics_params']] * 10)) # clusterIDs.size))
 
         metrics = pd.concat(results, ignore_index=True)
