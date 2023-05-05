@@ -81,7 +81,8 @@ def calculate_mean_waveforms(args):
                                 ' -samples_per_spike=' + repr(args['mean_waveform_params']['samples_per_spike']) + \
                                 ' -pre_samples=' + repr(args['mean_waveform_params']['pre_samples']) + \
                                 ' -num_spikes=' + repr(args['mean_waveform_params']['spikes_per_epoch']) + \
-                                ' -snr_radius=' + repr(args['mean_waveform_params']['snr_radius'])
+                                ' -snr_radius=' + repr(args['mean_waveform_params']['snr_radius']) + \
+                                ' -snr_radius_um=' + repr(args['mean_waveform_params']['snr_radius_um'])
                                 
         print(cwaves_cmd)
         

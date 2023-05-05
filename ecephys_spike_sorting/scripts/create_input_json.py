@@ -292,8 +292,7 @@ def createInputJson(output_file,
             "include_pcs" : include_pcs
         },
 
-        "mean_waveform_params" : {
-        
+        "mean_waveform_params" : {     
             "mean_waveforms_file" : os.path.join(kilosort_output_directory, 'mean_waveforms.npy'),
             "samples_per_spike" : 82,
             "pre_samples" : 20,
@@ -303,7 +302,8 @@ def createInputJson(output_file,
             "site_range" : wm_site_range,    
             "cWaves_path" : cWaves_path,
             "use_C_Waves" : True,
-            "snr_radius" : c_waves_radius_sites       
+            "snr_radius" : c_waves_radius_sites,
+            "snr_radius_um" : c_Waves_snr_um
         },
             
 
