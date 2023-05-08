@@ -45,7 +45,7 @@ logName = 'SC024_log.csv'
 
 # Raw data directory = npx_directory
 # run_specs = name, gate, trigger and probes to process
-npx_directory = r'D:\ecephys_fork\test_data\SC_10trial'
+npx_directory = r'D:\ecephys_test_data'
 
 # Each run_spec is a list of 4 strings:
 #   undecorated run name (no g/t specifier, the run field in CatGT)
@@ -58,7 +58,7 @@ npx_directory = r'D:\ecephys_fork\test_data\SC_10trial'
 #           these strings must match a key in the param dictionaries above.
 
 run_specs = [									
-						['SC024_092319_NP1.0_Midbrain', '0', '0,9', '0,1', ['cortex','cortex'] ]
+						['SC024_092319_NP1.0_Midbrain', '0', '0,9', '0', ['cortex'] ]
 ]
 
 # ------------------
@@ -67,7 +67,7 @@ run_specs = [
 # Set to an existing directory; all output will be written here.
 # Output will be in the standard SpikeGLX directory structure:
 # run_folder/probe_folder/*.bin
-catGT_dest = r'D:\ecephys_fork\test_data\catgt36'
+catGT_dest = r'D:\ecephys_test_data\SC024_out'
 
 # ------------
 # CatGT params
@@ -152,13 +152,13 @@ toStream_sync_params = 'imec0' # should be ni, imec<probe index>. or obx<obx ind
 modules = [
             'kilosort_helper',
             'kilosort_postprocessing',
-            #'noise_templates',    
-            'psth_events',
+            'noise_templates',    
+            #'psth_events',
             'mean_waveforms',
             'quality_metrics'
 			]
 
-json_directory = r'D:\ecephys_fork\json_files'
+json_directory = r'C:\Users\colonellj\Documents\ecephys_anaconda\json_files'
 
 # -----------------------
 # -----------------------
@@ -236,10 +236,10 @@ for spec in run_specs:
         # if this is the first probe proceessed, process the ni stream with it
         if i == 0 and ni_present:
             catGT_stream_string = '-ap -ni'
-#            extract_string = sync_extract + ' ' + ni_extract_string
+            extract_string = ni_extract_string
         else:
             catGT_stream_string = '-ap'
-#            extract_string = sync_extract
+            extract_string = ''
             
         if process_lf:
             catGT_stream_string = catGT_stream_string + ' -lf'
@@ -270,7 +270,7 @@ for spec in run_specs:
                                        catGT_car_mode = car_mode,
                                        catGT_loccar_min_um = loccar_min,
                                        catGT_loccar_max_um = loccar_max,
-                                       catGT_cmd_string = catGT_cmd_string + ' ' + ni_extract_string,
+                                       catGT_cmd_string = catGT_cmd_string + ' ' + extract_string,
                                        extracted_data_directory = catGT_dest
                                        )      
         
