@@ -110,9 +110,9 @@ Build the environment -- it will use the Pipfile located in this directory, and 
 
 The python version and MATLAB version need to be compatible. For Python 3.8, this requires MATLAB 2020b or later. The code has been tested only with MATLAB 2021b.
 
-Install MATLAB 2021b – side by side installations of MATLAB are fine, so there is no need to delete earlier versions, and running code specific to an earlier version should be possible.
+Install MATLAB 2021b. Side by side installations of MATLAB are fine, so there is no need to delete earlier versions, and running code specific to an earlier version should be possible.
 
-Open MATLAB 2021b, and enter the command gpuDevice(). You make get a message that there are no GPU devices with compatible drivers. Later versions of MATLAB also require more recent drivers for the GPU card – MATLAB 2021b requires version 10.1 or later of the Nvidia drivers. 
+Open MATLAB 2021b, and enter the command gpuDevice(). You make get a message that there are no GPU devices with compatible drivers. Later versions of MATLAB also require more recent drivers for the GPU card –- MATLAB 2021b requires version 10.1 or later of the Nvidia drivers. 
 
 If you get that message, quit MATLAB. Update the drivers for the GPU card -- this can be done with the Device Manager in Windows 10, and will also happen automatically if you update the CUDA Toolkit. The pipeline has been tested with CUDA Toolkit 11, which is compatible with GPUs back to the NVIDIA Maxwell architecture. After updating, restart MATLAB and enter gpuDevice() again to make sure it is recognized.
 
@@ -183,9 +183,9 @@ pip install h5py
 
 The python version and MATLAB version need to be compatible. To be compatible with python 3.9, the MATLAB version must be 2021b or later.
 
-Install MATLAB 2021b – side by side installations of MATLAB are fine, so there is no need to delete earlier versions.
+Install MATLAB 2021b –- side by side installations of MATLAB are fine, so there is no need to delete earlier versions.
 
-Open MATLAB 2021b, and enter the command gpuDevice(). You make get a message that there are no GPU devices with compatible drivers. Later versions of MATLAB also require more recent drivers for the GPU card – MATLAB 2021b requires version 10.1 or later of the Nvidia drivers. 
+Open MATLAB 2021b, and enter the command gpuDevice(). You make get a message that there are no GPU devices with compatible drivers. Later versions of MATLAB also require more recent drivers for the GPU card –- MATLAB 2021b requires version 10.1 or later of the Nvidia drivers. 
 
 If you get that message, quit MATLAB. Update the drivers for the GPU card -- this can be done with the Device Manager in Windows 10, and will also happen automatically if you update the CUDA Toolkit. The pipeline has been tested with CUDA Toolkit 11.2, which is compatible with GPUs back to the NVIDIA Maxwell architecture. After updating, restart MATLAB and enter gpuDevice() again to make sure it is recognized.
 
@@ -207,7 +207,7 @@ https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-
 
 NOTE: This install needs to be repeated whenenver the virtual environment is rebuilt (e.g. after creating a new clone or download of the repo).
 
-After completing the install, close the command window and reopen as a normal user (not administrator) to run scripts.
+After completing the install, close the Anaconda window and reopen as a normal user (not administrator) to run scripts.
 
 
 
