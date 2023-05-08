@@ -1,3 +1,4 @@
+# Original code from Cristian Goina, written for Janelia cluster ecephys pipeline
 import ast
 import numpy as np
 import os

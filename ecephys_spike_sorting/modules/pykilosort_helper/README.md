@@ -1,13 +1,13 @@
-Kilosort Helper
+pykilosort Helper
 ==============
-Python wrapper for Matlab-based spike sorting with Kilosort.
+Caller for Jennifer Colonell's fork of the International Brain Laboratory python version of Kilosort. Run with the default parameters, this runs a version of kilosort that is very similar to the KS2.5 release.
 
-This module auto-generates the channel map (reading from the SpikeGLX metadata file), configuration file (reading parameters from the schema; these can be edited in create_input_json.py), and master file for Kilosort, and runs everything via the Matlab engine.
+This module auto-generates the channel map (reading from the SpikeGLX metadata file), and ks_params structure (reading parameters from the schema; these can be edited in create_input_json.py), 
 
 Dependencies
 ------------
-[Kilosort](https://github.com/MouseLand/Kilosort2) or [Kilosort2](https://github.com/cortex-lab/kilosort) - requires Matlab >=R2016b with Signal Processing and Parallel Computing Toolboxes, Visual Studio Community 2013, and a CUDA-compatible GPU
-[Matlab Engine API for Python](https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html) - this may restrict the Python version you're able to use
+[pykilosort](https://github.com/jenniferColonell/pykilosort)
+Other dependencies as given in ece_pyks2.yml
 
 Running
 -------
