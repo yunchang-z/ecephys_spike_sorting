@@ -177,6 +177,7 @@ pip install argschema==1.17.5
 pip uninstall marshmallow
 pip install marshmallow==2.19.2
 pip install h5py
+```
 
 ### Set up to run MATLAB from Python in Anconda
 
