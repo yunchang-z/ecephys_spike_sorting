@@ -159,7 +159,7 @@ pip uninstall setuptools
 pip install setuptools==59.8.0
 ```
 
-To install pykilsort and other components, navigate to the pykilosort directory. 
+To install pykilsort and other components, navigate to the pykilosort directory and run the commands: 
 
 ```shell
 pip install -e .
@@ -168,7 +168,7 @@ conda install -c conda-forge pyfftw
 pip install git+https://github.com/int-brain-lab/ibllib.git
 pip install -U phylib
 ```
-Next install ecephys. To force the correct versions of some components, they must be uninstalled and reinstalled manually. This will be corrected in a later verison. From the anaconda propt, Navigate to the ecephys_spike_sorting directory (containing setup.py):
+Next install ecephys. To force the correct versions of some components, they must be uninstalled and reinstalled manually. This will be corrected in a later verison. From the anaconda prompt, navigate to the ecephys_spike_sorting directory (containing setup.py) and run the commands:
 
 ```shell
 pip install -e .
@@ -183,7 +183,7 @@ pip install h5py
 
 The python version and MATLAB version need to be compatible. To be compatible with python 3.9, the MATLAB version must be 2021b or later.
 
-Install MATLAB 2021b. side by side installations of MATLAB are fine, so there is no need to delete earlier versions.
+Install MATLAB 2021b. Side by side installations of MATLAB are fine, so there is no need to delete earlier versions.
 
 Open MATLAB 2021b, and enter the command gpuDevice(). You make get a message that there are no GPU devices with compatible drivers. Later versions of MATLAB also require more recent drivers for the GPU card. MATLAB 2021b requires version 10.1 or later of the Nvidia drivers. 
 
@@ -237,9 +237,9 @@ In **create_input_json.py**, be sure to set these paths and parameters for your 
 
 >>> Note: The kilosort_output_temp folder contains the kilosort residual file and also temporary copies of the config and master file. With kilosort 2.5, this "temporary" file--which has been drift corrected--may be used for manual curation in phy. If you want it to be kept available, set the parameter ks_copy_fproc=1; then a copy will be made with the kilosort output and the params.py adjusted automatically.
 
-Other “mostly constant” parameters in **create_input_json.py**:
+Other rarely changed parameters in **create_input_json.py**:
 
-- Most Kilosort2 parameters. 
+- Most Kilosort and pykilosort parameters. 
 - kilosort post processing params 
 - quality metrics params
 
@@ -264,7 +264,7 @@ For either script, edit to set the destination for the json_files, and the locat
 
 These scripts are easy to customize to send the output to different directories. 
 
-To run scripts in pipenv, open a Windows command line, activate the environment, navigate to the ecephys_spike_sorting\scripts directory and enter:
+To run scripts in pipenv, open a Windows command line, navigate to the ecephys_spike_sorting\scripts directory and enter:
 
 ```shell
    pipenv shell
