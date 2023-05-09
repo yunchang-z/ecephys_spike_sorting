@@ -59,8 +59,8 @@ These modules have been tested with Python 3.8.10 and 3.9.
 
 If you only plan to use only the MATLAB version of Kilosort, you can install and run using the procedure recommended by the original authors at the Allen Institute, which uses [pipenv](https://github.com/pypa/pipenv).
 
-If you want to run pykilosort, or just prefer Anaconda, please skip down to [Installation with Anaconda] (
-# Installation with Anaconda).
+If you want to run pykilosort, or just prefer Anaconda, please skip down to [Installation with Anaconda](
+#Installation with Anaconda).
 
 All of the components of the SpikeGLX pipeline are available in Windows and Linux, but the pipeline has only been tested in Windows. These instructions are for Windows 10.
 
@@ -190,7 +190,7 @@ Open MATLAB 2021b, and enter the command gpuDevice(). You make get a message tha
 
 If you get that message, quit MATLAB. Update the drivers for the GPU card; this can be done with the Device Manager in Windows 10, and will also happen automatically if you update the CUDA Toolkit. The pipeline has been tested with CUDA Toolkit 11.2 (by the way, all CUDA toolkit versions are backward compatible to older hardware). After updating, restart MATLAB and enter gpuDevice() again to make sure it is recognized.
 
-The MATLAB engine for python must be installed in the local instance of python run by the virtual environment. Open an Anconda prompt as administrator, activate the environment, and then navigate the setup script for the MATLAB engine:
+The MATLAB engine for python must be installed in the local instance of python run by the virtual environment. Open an Anaconda prompt as administrator, activate the environment, and then navigate the setup script for the MATLAB engine:
 
 ```shell
 conda activate ece_pyks2
