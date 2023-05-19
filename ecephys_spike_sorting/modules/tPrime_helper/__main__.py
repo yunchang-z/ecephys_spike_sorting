@@ -50,16 +50,17 @@ def call_TPrime(args):
         toStream_id = (toStream_js, toStream_ip)
         toStream_path, from_list, from_list_ids, events_list, from_stream_index, out_list = parse_catgt_fy(fyi_path, toStream_id)
         
-        # if toStream is an imec probe, create the file of spike times in sec
-        prb_dir = prb_dir_prefix + str(toStream_ip)
-        ks_outdir = 'imec' + str(toStream_ip) + '_ks2'        
-        st_file = os.path.join(run_directory, prb_dir, ks_outdir, 'spike_times.npy')
-        # convert to seconds; if bNPY = True, returned file is an npy file
-        # otherwise, text.
-        toStream_events_sec = spike_times_npy_to_sec(st_file, 0, bNPY)
-        # if data was saved as text, also save as npy
-        if not bNPY:
-            spike_times_sec_to_npy(toStream_events_sec)
+        if toStream_js == 2:
+            # if toStream is an imec probe, create the file of spike times in sec
+            prb_dir = prb_dir_prefix + str(toStream_ip)
+            ks_outdir = 'imec' + str(toStream_ip) + '_ks2'        
+            st_file = os.path.join(run_directory, prb_dir, ks_outdir, 'spike_times.npy')
+            # convert to seconds; if bNPY = True, returned file is an npy file
+            # otherwise, text.
+            toStream_events_sec = spike_times_npy_to_sec(st_file, 0, bNPY)
+            # if data was saved as text, also save as npy
+            if not bNPY:
+                spike_times_sec_to_npy(toStream_events_sec)
                         
         # loop over the from_list_ids; for any that are probes, need to create 
         # files of spike times, and append to event_list, from_stream_index, and out_list
