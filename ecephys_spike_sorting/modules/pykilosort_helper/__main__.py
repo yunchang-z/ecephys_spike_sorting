@@ -1,4 +1,3 @@
-# Original code from Cristian Goina, written for Janelia cluster ecephys pipeline
 import ast
 import numpy as np
 import os
@@ -40,7 +39,7 @@ def _get_ks_params(meta_file, params_dict):
     params.car = params_dict.get('car', False)
     params.fs = probe_meta.get('imSampRate', 30000)  # sample rate
     params.n_channels = int(probe_meta.get('nSavedChans'))
-    params.save_temp_files = params_dict.get('save_temp_files', True)
+    params.save_temp_files = params_dict.get('save_temp_files', False)
     if params_dict.get('doFilter'):
         params.fshigh = params_dict.get('fshigh')
         params.fslow = params_dict.get('fslow')
@@ -129,6 +128,11 @@ def run_kilosort(args):
     MetaToCoords(metaFullPath=meta_file, outType=1,
                  destFullPath=str(chanmap_file))
 
+    # make a copy of the chanMap file to the binary directory; pyks looks inside
+    # output directory (matching nextflow pipeline); modules in this pipeline
+    # in binary directory.
+    shutil.copy(chanmap_file, os.path.join(ks_output_dir.parent, chanmap_filename))
+    
     pyks_params = args['pykilosort_helper_params']
     ks_params = _get_ks_params(meta_file, pyks_params)
     print(repr(ks_params))
