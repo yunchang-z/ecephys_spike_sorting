@@ -213,6 +213,15 @@ def CreateNITimeEvents(catGT_run_name, gate_string, catGT_dest):
     out_name = catGT_run_name + '_g' + gate_string + '_tcat.nidq.times.npy'
     out_path = os.path.join(catGT_dest, output_folder, out_name)
     np.save(out_path,ni_times)
-
+    
+    # check for presence of an fyi file, indicating run with catgt 3.0 or later
+    fyi_path = Path(os.path.join(catGT_dest, output_folder, catGT_run_name + '_g' + gate_string + '_all_fyi.txt'))
+    print(fyi_path)
+    fyi_exists = Path(fyi_path).is_file()
+    if fyi_exists:
+        # append a line for the newly created times file        
+        file_fyi = open(fyi_path, "a")  # append mode
+        file_fyi.write('times_ni_N=' + out_path + '\n')
+        file_fyi.close()
 
     return

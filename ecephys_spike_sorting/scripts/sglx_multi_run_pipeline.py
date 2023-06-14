@@ -41,11 +41,11 @@ ksTh_dict = {'default':'[10,4]', 'cortex':'[10,4]', 'medulla':'[10,4]', 'thalamu
 # Name for log file for this pipeline run. Log file will be saved in the
 # output destination directory catGT_dest
 # If this file exists, new run data is appended to it
-logName = 'SC024_log.csv'
+logName = 'SC048_log.csv'
 
 # Raw data directory = npx_directory
 # run_specs = name, gate, trigger and probes to process
-npx_directory = r'D:\ecephys_test_data'
+npx_directory = r'D:\SC048_in'
 
 # Each run_spec is a list of 4 strings:
 #   undecorated run name (no g/t specifier, the run field in CatGT)
@@ -58,7 +58,7 @@ npx_directory = r'D:\ecephys_test_data'
 #           these strings must match a key in the param dictionaries above.
 
 run_specs = [									
-						['SC024_092319_NP1.0_Midbrain', '0', '0,9', '0', ['cortex'] ]
+						['SC048_122920_ex', '0', '0,0', '0', ['cortex','cortex'] ]
 ]
 
 # ------------------
@@ -67,7 +67,7 @@ run_specs = [
 # Set to an existing directory; all output will be written here.
 # Output will be in the standard SpikeGLX directory structure:
 # run_folder/probe_folder/*.bin
-catGT_dest = r'D:\ecephys_test_data\SC024_out'
+catGT_dest = r'D:\SC048_out'
 
 # ------------
 # CatGT params
@@ -152,7 +152,7 @@ toStream_sync_params = 'imec0' # should be ni, imec<probe index>. or obx<obx ind
 modules = [
             'kilosort_helper',
             'kilosort_postprocessing',
-            'noise_templates',    
+            #'noise_templates',    
             #'psth_events',
             'mean_waveforms',
             'quality_metrics'
@@ -274,6 +274,7 @@ for spec in run_specs:
                                        extracted_data_directory = catGT_dest
                                        )      
         
+        
         #create json files for the other modules
         session_id.append(spec[0] + '_imec' + prb)
         
@@ -353,25 +354,25 @@ for spec in run_specs:
                  modules,
                  module_input_json[i],
                  logFullPath )
-                 
+                
         
+      
     if runTPrime:
+               
         # after loop over probes, run TPrime to create files of 
         # event times -- edges detected in auxialliary files and spike times 
         # from each probe -- all aligned to a reference stream.
+        
+        # Uncomment line belwo to create a set of all ni time points, which can be
+        # corrected by TPrime. This output is used to obtain analog values
+        # from the NI stream at spike times.
+        # Will cause an error if no ni stream exists.
+        # SpikeGLX_utils.CreateNITimeEvents(spec[0], spec[1], catGT_dest)
     
         # create json files for calling TPrime
         session_id = spec[0] + '_TPrime'
         input_json = os.path.join(json_directory, session_id + '-input.json')
-        output_json = os.path.join(json_directory, session_id + '-output.json')
-        
-        # build list of sync extractions to send to TPrime
-        im_ex_list = ''
-        for i, prb in enumerate(prb_list):
-            sync_extract = '-SY=' + prb +',-1,6,500'
-            im_ex_list = im_ex_list + ' ' + sync_extract
-            
-        print('im_ex_list: ' + im_ex_list)     
+        output_json = os.path.join(json_directory, session_id + '-output.json')                      
         
         info = createInputJson(input_json, npx_directory=npx_directory, 
     	                                   continuous_file = continuous_file,
@@ -379,8 +380,7 @@ for spec in run_specs:
                                            input_meta_path = input_meta_fullpath,
                                            catGT_run_name = spec[0],
     									   kilosort_output_directory=kilosort_output_dir,
-                                           extracted_data_directory = catGT_dest,
-                                           tPrime_im_ex_list = im_ex_list,
+                                           extracted_data_directory = catGT_dest,                                           
                                            tPrime_ni_ex_list = ni_extract_string,
                                            event_ex_param_str = event_ex_param_str,
                                            sync_period = 1.0,
@@ -393,5 +393,6 @@ for spec in run_specs:
         command = sys.executable + " -W ignore -m ecephys_spike_sorting.modules." + 'tPrime_helper' + " --input_json " + input_json \
     		          + " --output_json " + output_json
         subprocess.check_call(command.split(' '))  
-    
+        
+        
 

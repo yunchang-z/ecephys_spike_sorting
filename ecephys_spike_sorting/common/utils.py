@@ -330,12 +330,13 @@ def load_kilosort_data(folder,
     for temp_idx in range(templates.shape[0]):
         
         unwhitened_temps[temp_idx,:,:] = np.dot(np.ascontiguousarray(templates[temp_idx,:,:]),np.ascontiguousarray(unwhitening_mat))
-                    
-    try:
-        cluster_ids, cluster_quality = read_cluster_group_tsv(os.path.join(folder, 'cluster_group.tsv'))
-    except OSError:
-        cluster_ids = np.unique(spike_clusters)
-        cluster_quality = ['unsorted'] * cluster_ids.size
+    
+    # removed option to read cluster_ids from cluster_group_tsv because this file is changed by phy.                
+    # try:
+    #     cluster_ids, cluster_quality = read_cluster_group_tsv(os.path.join(folder, 'cluster_group.tsv'))
+    # except OSError:
+    cluster_ids = np.unique(spike_clusters)
+    cluster_quality = ['unsorted'] * cluster_ids.size
         
     cluster_amplitude = read_cluster_amplitude_tsv(os.path.join(folder, 'cluster_Amplitude.tsv'))
     

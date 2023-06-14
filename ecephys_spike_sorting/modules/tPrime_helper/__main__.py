@@ -1,5 +1,6 @@
 from argschema import ArgSchemaParser
 import os
+import shutil
 import sys
 import subprocess
 import time
@@ -41,14 +42,22 @@ def call_TPrime(args):
     
     # check for presence of an fyi file, indicating run with catgt 3.0 or later
     fyi_path = run_directory.replace('\\', '/') + '/' + run_name + '_all_fyi.txt'
-    fyi_exists = Path(fyi_path).is_file()
+    all_fyi_exists = Path(fyi_path).is_file()
     
-    if fyi_exists:
+    if not all_fyi_exists:
+        # check for an fyi file -- assume that CatGT was run directly from
+        # a batch file for all probes, and use that, but also print message
+        print('No _all_fyi.txt file found.')
+        print('Checking for _fyi.txt file from CatGT run outside ecephys pipeline.')
+        fyi_path = run_directory.replace('\\', '/') + '/' + run_name + '_fyi.txt'
+        fyi_exists = Path(fyi_path).is_file()
+    
+    if all_fyi_exists or fyi_exists:
         
         toStream_params = args['tPrime_helper_params']['toStream_sync_params']
         toStream_js, toStream_ip = parse_stream(toStream_params)
         toStream_id = (toStream_js, toStream_ip)
-        toStream_path, from_list, from_list_ids, events_list, from_stream_index, out_list = parse_catgt_fy(fyi_path, toStream_id)
+        toStream_path, from_list, from_list_ids, events_list, from_stream_index, out_list = parse_catgt_fyi(fyi_path, toStream_id)
         
         if toStream_js == 2:
             # if toStream is an imec probe, create the file of spike times in sec
@@ -58,6 +67,8 @@ def call_TPrime(args):
             # convert to seconds; if bNPY = True, returned file is an npy file
             # otherwise, text.
             toStream_events_sec = spike_times_npy_to_sec(st_file, 0, bNPY)
+            # create a copy with name = spike_times_sec.adj
+            shutil.copyfile(toStream_events_sec, os.path.join(run_directory, prb_dir, ks_outdir, 'spike_times_sec_adj.npy'))
             # if data was saved as text, also save as npy
             if not bNPY:
                 spike_times_sec_to_npy(toStream_events_sec)
@@ -80,217 +91,16 @@ def call_TPrime(args):
                 out_list.append(out_file)
                          
     else:
+        # Must be running with data from older CatGT with no fyi file
+        
+        print('No fyi file found.')
+        print('You can generate a new fyi file by running an extract only pass on the CatGT output.')
+        print('Typical extract only command line also see CatGT Readme under: -t=cat defer extraction to a later pass ')
+        print('-dir=<catGT_dest> -run=catgt_<run_name> -g=0 -t=cat -ap -ni -prb=0 -prb_fld -no_tshift ^ ' )
+        print('-ap -ni -prb=0 -prb_fld -no_tshift ^')
+        print('<ni extraction string for CatGT 4.0> ^')
+        print('dest=<catGT_dest>')    
 
-        # build list of from streams
-        #   all streams for which sync edges have been extracted
-    
-        toStream_params = args['tPrime_helper_params']['toStream_sync_params']
-        ni_sync_params = args['tPrime_helper_params']['ni_sync_params']
-        
-        ni_ex_string = args['tPrime_helper_params']['ni_ex_list']       
-        ni_ex_list = list()
-        
-        if ni_ex_string != '':
-            # find start points all instances of '-X' in ni_ex_string
-            ni_str_list = ni_ex_string.split(' ')
-            nstr = len(ni_str_list)
-            for i in range(nstr):
-                firstDash = ni_str_list[i].find('-')
-                if firstDash >= 0:
-                    print(ni_str_list[i][firstDash+1:])
-                    ni_ex_list.append(ni_str_list[i][firstDash+1:])
-            # need to get the file name from the directory in case user used the  
-            # -1 option to specify the digital channel     
-            # extracted ni files are in the run directory
-            match_XA_str = run_name + '_tcat.nidq.XA_*.txt'
-            match_XD_str = run_name + '_tcat.nidq.XD_*.txt'
-            match_iXA_str = run_name + '_tcat.nidq.iXA_*.txt'
-            match_iXD_str = run_name + '_tcat.nidq.iXD_*.txt'
-            match_times_str = run_name + '_tcat.nidq.times.npy'
-            file_list = os.listdir(run_directory)
-            ni_ex_files = fnmatch.filter(file_list,match_XA_str) + \
-                          fnmatch.filter(file_list,match_XD_str) + \
-                          fnmatch.filter(file_list,match_iXA_str) + \
-                          fnmatch.filter(file_list,match_iXD_str) + \
-                          fnmatch.filter(file_list,match_times_str)
-                              
-        
-        im_ex_string = args['tPrime_helper_params']['im_ex_list']
-        im_ex_list = list()
-        
-        if im_ex_string != '':
-            # find start points all instances of '-X' in ni_ex_string
-            im_str_list = im_ex_string.split(' ')
-            nstr = len(im_str_list)
-            for i in range(nstr):
-                firstDash = im_str_list[i].find('-')
-                if firstDash >= 0:
-                    print(im_str_list[i][firstDash+1:])
-                    im_ex_list.append(im_str_list[i][firstDash+1:])
-        
-        
-        toStream_type, toStream_prb, toStream_ex_name = catGT_ex_params_from_str(toStream_params)
-    
-        from_list = list()       # list of files of sync edges for streams to translate to reference
-        events_list = list()     # list of files of event times to translate to reference
-        from_stream_index = list()     # list of indicies matching event files to a from stream
-        out_list = list()    # list of paths for output files, one per event file
-        
-        c_type, c_prb, ni_sync_ex_name = catGT_ex_params_from_str(ni_sync_params)
-    
-        if toStream_type == 'SY':
-            
-            # toStream is a probe stream sync pulse
-            # need to get the file name from the directory in case user used the  
-            # -1 option to specify the last channel in the file 
-            prb_dir = prb_dir_prefix + str(toStream_prb)
-            match_str = run_name + '_tcat.imec' + str(toStream_prb) + '.ap.SY_*_6_*.txt'
-            file_list = os.listdir(os.path.join(run_directory,prb_dir))
-            flt_list = fnmatch.filter(file_list,match_str)
-            if len(flt_list) != 1:
-                print('No edge file or multiple files for toStream found\n' )
-                return              
-            toStream_name = flt_list[0]
-            
-            toStream_path = os.path.join(run_directory, prb_dir, toStream_name)
-            
-            # convert events in the toStream to sec; they will not be adjusted
-            ks_outdir = 'imec' + str(toStream_prb) + '_ks2'
-            st_file = os.path.join(run_directory, prb_dir, ks_outdir, 'spike_times.npy')
-            # convert to seconds; if bNPY = True, returned file is an npy file
-            # otherwise, text.
-            toStream_events_sec = spike_times_npy_to_sec(st_file, 0, bNPY)
-            # if data was saved as text, also save as npy
-            if not bNPY:
-                spike_times_sec_to_npy(toStream_events_sec)
-    
-    
-    
-            # fromStreams will include all other SY + NI if present
-    
-            # loop over SY, add the sync file to the fromList
-            # get extraction parameters, build name for output file
-    
-            for ex_str in im_ex_list:
-                # get params
-                c_type, c_prb, c_ex_name = catGT_ex_params_from_str(ex_str) 
-                if c_ex_name == toStream_name:
-                    continue
-                
-                # These are imec SYNC channels
-                # need to get the file name from the directory in case user used the  
-                # -1 option to specify the last channel in the file 
-                prb_dir = prb_dir_prefix + str(c_prb)
-                match_str = run_name + '_tcat.imec' + str(c_prb) + '.ap.SY_*_6_*.txt'
-                file_list = os.listdir(os.path.join(run_directory,prb_dir))
-                flt_list = fnmatch.filter(file_list,match_str)
-                if len(flt_list) != 1:
-                    print('No edge file or multiple files for toStream found\n' )
-                    return              
-                c_name = flt_list[0]
-                 
-                from_list.append(os.path.join(run_directory, prb_dir, c_name))
-                c_index = len(from_stream_index)
-                # build path to spike times npy file
-                ks_outdir = 'imec' + str(c_prb) + '_ks2'
-                st_file = os.path.join(run_directory, prb_dir, ks_outdir, 'spike_times.npy')
-                st_file_sec = spike_times_npy_to_sec(st_file, 0, bNPY)
-                events_list.append(st_file_sec)
-                from_stream_index.append(c_index)
-                # build path for output spike times text file
-                out_name = 'spike_times_sec_adj' + outSuffix
-                out_file = os.path.join(run_directory, prb_dir,ks_outdir, out_name)
-                out_list.append(out_file)
-        
-            # get index for sync channel in NI. If none or not found, no ni
-            # edge files will be added to events_list
-            matchI = [i for i, value in enumerate(ni_ex_list) if ni_sync_params in value]
-            
-            if len(matchI) == 1:
-                # get params
-              
-                # build match string to find file of NI sync edges
-                # for the digital channel match string uses a wild card
-                # '*" character for the word parameter
-                c_type, c_prb, c_ex_name = catGT_ex_params_from_str(ni_sync_params)            
-                c_name = run_name + '_tcat.nidq.' + c_ex_name + '.txt'
-                c_name_match = fnmatch.filter(ni_ex_files, c_name) 
-                
-                if len(c_name_match) == 1:
-                    # add to list of from_files for TPrime
-                    from_list.append(os.path.join(run_directory, c_name_match[0]))
-                    
-                    # remove from list of ni_ex_files. The other files will be added to events list
-                    ni_ex_files.remove(c_name_match[0])
-                    
-                else:
-                    print('No match or multiple matches for ni sync file in Tprime_helper.' )           
-                
-                #index for this from stream
-                c_index = len(from_stream_index)
-                
-                # loop over the remaining files of edges extracted from NI,
-                # add to events_list and out_file
-                for ex_file in ni_ex_files:
-                    # get params
-                    events_list.append(os.path.join(run_directory, ex_file))
-                    from_stream_index.append(c_index)
-                    
-                    # get suffix for this file
-                    suf = Path(ex_file).suffix
-                    ext_pos = ex_file.find(suf)                
-                    c_output_name = ex_file[0:ext_pos] + '.adj' + suf              
-                    out_file = os.path.join(run_directory, c_output_name)
-                    out_list.append(out_file) 
-            else:
-                print('No NI sync channel found')
-    
-                    
-        else:
-            # toStream is NI
-            
-            # build match string to find file of NI sync edges
-            # for the digital channel match string uses a wild card
-            # '*" character for the word parameter
-            c_type, c_prb, c_ex_name = catGT_ex_params_from_str(ni_sync_params)            
-            c_name = run_name + '_tcat.nidq.' + c_ex_name + '.txt'
-            flt_list = fnmatch.filter(ni_ex_files, c_name) 
-            toStream_name = flt_list[0]
-            toStream_path = os.path.join(run_directory, toStream_name)
-    
-            # build list of event files, include: 
-            #   all files of spike times
-            #   no NI files, because they are already in the "toStream"
-    
-            # loop over all SY files
-            for ex_str in im_ex_list:
-                # get params
-                c_type, c_prb, c_ex_name = catGT_ex_params_from_str(ex_str)
-                
-                # These are imec SYNC channels
-                # need to get the file name from the directory in case user used the  
-                # -1 option to specify the last channel in the file 
-                prb_dir = prb_dir_prefix + str(c_prb)
-                match_str = run_name + '_tcat.imec' + str(c_prb) + '.ap.SY_*_6_*.txt'
-                file_list = os.listdir(os.path.join(run_directory,prb_dir))
-                flt_list = fnmatch.filter(file_list,match_str)
-                if len(flt_list) != 1:
-                    print('No edge file or multiple files for fromStream found\n' )
-                    return              
-                c_name = flt_list[0]
-               
-                from_list.append(os.path.join(run_directory, prb_dir, c_name))
-                c_index = len(from_stream_index)
-                # build path to spike times npy file
-                ks_outdir = 'imec' + str(c_prb) + '_ks2'
-                st_file = os.path.join(run_directory, prb_dir, ks_outdir, 'spike_times.npy')
-                st_file_sec = spike_times_npy_to_sec(st_file, 0, bNPY)
-                events_list.append(st_file_sec)
-                from_stream_index.append(c_index)
-                # build path for output spike times text file
-                out_name = 'spike_times_sec_adj' + outSuffix
-                out_file = os.path.join(run_directory, prb_dir, ks_outdir, out_name)
-                out_list.append(out_file)
 
     print('toStream:')
     print(toStream_path)
@@ -572,7 +382,7 @@ def parse_stream(stream_str):
         
     
     
-def parse_catgt_fy(fyi_path, toStream_id):
+def parse_catgt_fyi(fyi_path, toStream_id):
 
     # read fyi file, build array of paths to sync files 
     # toStream_id is the tuple (js,ip) for the toStream

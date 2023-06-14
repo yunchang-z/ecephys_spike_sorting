@@ -61,6 +61,14 @@ def calculate_mean_waveforms(args):
                 os.rename(old_snr, new_snr)
 
         
+        # kilosort saves the spike_clusters files as uint32. 
+        # when phy re-saves after curation, it saves as int32 (!)
+        # to ensure the correct datatype for C_Waves, load the spike_clusters
+        # and convert if necessary
+        sc = np.load(clus_lbl_npy)
+        if sc.dtype != 'uint32':
+            sc = sc.astype('uint32')
+            np.save(clus_lbl_npy,sc)
             
         
         
