@@ -57,7 +57,8 @@ def call_TPrime(args):
         toStream_params = args['tPrime_helper_params']['toStream_sync_params']
         toStream_js, toStream_ip = parse_stream(toStream_params)
         toStream_id = (toStream_js, toStream_ip)
-        toStream_path, from_list, from_list_ids, events_list, from_stream_index, out_list = parse_catgt_fyi(fyi_path, toStream_id)
+        toStream_path, from_list, from_list_ids, events_list, from_stream_index, out_list, all_list \
+            = parse_catgt_fyi(fyi_path, toStream_id)
         
         if toStream_js == 2:
             # if toStream is an imec probe, create the file of spike times in sec
@@ -146,139 +147,15 @@ def call_TPrime(args):
     if not bNPY:
         for op in out_list:
             spike_times_sec_to_npy(op)
-
-    execution_time = time.time() - start
-
-    print('total time: ' + str(np.around(execution_time, 2)) + ' seconds')
-
-    return {"execution_time": execution_time}  # output manifest
-
-
-def call_TPrime_3A(args):
-
-    # call TPrime for 3A data
-    # assumes no nidq stream
-    # incoming paths are to the catGT output folder; for the toStream and
-    # the fromStreams, find the file of extracted edges that matches
-    # the toStream_params
-    # inputs:
-    # full path to Tprime executable
-    # path to "toStream" catGT output, plus the "toStream_params"
-    # paths to "from stream" catGT output folders
+            
+            
+    # if the psth extract string is not null
     
-    # bNPY, if True, no text files of spike times will be written
-    bNPY = True
-    if bNPY:
-        outSuffix = '.npy'
-    else:
-        outSuffix = '.txt'
-
-    print('ecephys spike sorting: TPrime helper module')
-    start = time.time()
-
-    # for twStream, get the spike events and convert to seconds
-    toStream_parent = args['tPrime_helper_params']['toStream_path_3A']
-    
-    #
-    toStream_params = args['tPrime_helper_params']['toStream_sync_params']
-    
-    c_type, c_prb, c_ex_name = catGT_ex_params_from_str(toStream_params)
-    match_str = '*_tcat.imec.ap.' + c_ex_name + '.txt'   # will be used for both toStream and fromStream(s)
-    print(toStream_parent)
-    print(match_str)
-    file_list = os.listdir(toStream_parent)
-    flt_list = fnmatch.filter(file_list,match_str)
-    if len(flt_list) != 1:
-        print('No edge file or multiple files for toStream found\n' )
-        return              
-    toStream_name = flt_list[0]
-    toStream_path = os.path.join(toStream_parent, toStream_name)
-
-    from_list = args['tPrime_helper_params']['fromStream_list_3A']       # list of files of sync edges for streams to translate to reference
-    fS_file_list = list()
-    events_list = list()     # list of files of event times to translate to reference
-    from_stream_index = list()     # list of indicies matching event files to a from stream
-    out_list = list()    # list of paths for output files, one per event file
-
-    # convert events in the toStream to sec; they will not be adjusted
-    # search the directory the edges file to get the ks2 output
-    # get name of ks2 output dir and convert to sec
-    ks_outdir = fnmatch.filter(file_list, 'imec_*_ks2')[0]
-    st_file = os.path.join(toStream_parent, ks_outdir, 'spike_times.npy')
-    toStream_events_sec = spike_times_npy_to_sec(st_file, 0, bNPY)
-    # for later data analysis with spike times as sec, also save as npy
-    if not bNPY:
-        spike_times_sec_to_npy(toStream_events_sec)
-
-    # for each member of from_list, find the edge file in that directory, and
-    # adjust only the spike times. For 3A, other digital channels are copies
-    # of those in the toStream
-
-    
-    for fS_parent in from_list:
-        file_list = os.listdir(fS_parent)
-        flt_list = fnmatch.filter(file_list,match_str)
-        if len(flt_list) != 1:
-            print('No edge file or multiple files for fromStream found\n' )
-            return              
-        fS_name = flt_list[0]
-        fS_file_list.append(os.path.join(fS_parent,fS_name))
-        ks_outdir = fnmatch.filter(file_list, 'imec_*_ks2')[0]
-        st_file = os.path.join(fS_parent, ks_outdir, 'spike_times.npy')
-        st_file_sec = spike_times_npy_to_sec(st_file, 0, bNPY)
-        events_list.append(st_file_sec)
-        c_index = len(from_stream_index)
-        from_stream_index.append(c_index)
-        # build path for output spike times text file
-        out_name = 'spike_times_sec_adj' + outSuffix
-        out_file = os.path.join(fS_parent, ks_outdir, out_name)
-        out_list.append(out_file)
-
-    # Print out paths for help with debugging
-    print('toStream:')
-    print(toStream_path)
-    print('fromStream')
-    for fp in fS_file_list:
-        print(fp)
-    print('event files')
-    for i, ep in enumerate(events_list):
-        print('index: ' + repr(from_stream_index[i]) + ',' + ep)
-    print('output files')
-    for op in out_list:
-        print(op)
-
-    # path to the 'runit.bat' executable that calls TPrime.
-    # Essential in linux where TPrime executable is only callable through runit
-    if sys.platform.startswith('win'):
-        exe_path = os.path.join(args['tPrime_helper_params']['tPrime_path'], 'runit.bat')
-    elif sys.platform.starstwith('linux'):
-        exe_path = os.path.join(args['tPrime_helper_params']['tPrime_path'], 'runit.sh')
-    else:
-        print('unknown system, cannot run TPrime')  
-        
-    sync_period = args['tPrime_helper_params']['sync_period']
-
-    tcmd = exe_path + ' -syncperiod=' + repr(sync_period) + \
-        ' -tostream=' + toStream_path
-
-    for i, fp in enumerate(fS_file_list):
-        tcmd = tcmd + ' -fromstream=' + repr(i) + ',' + fp
-
-    for i, ep in enumerate(events_list):
-        tcmd = tcmd + ' -events=' + repr(from_stream_index[i]) + ',' + ep + ',' + out_list[i]
-
-    # write out batch file to call TPrime
-    bat_path = os.path.join(toStream_parent, toStream_name + '_TPrime.bat')
-    with open(bat_path, 'w') as batfile:
-        batfile.write(tcmd)
-
-    # make the TPrime call
-    subprocess.call(tcmd)
-
-    # convert output files to npy
-    if not bNPY:
-        for op in out_list:
-            spike_times_sec_to_npy(op)
+    extract_str = args['tPrime_helper_params']['psth_ex_str']
+    if len(extract_str) > 0:
+        prbDir_list = create_prbDir_list(run_directory, prb_dir_prefix)
+        create_PSTH_events( all_list, out_list, prbDir_list, extract_str, \
+                           args['tPrime_helper_params']['sort_out_tag'] )
 
     execution_time = time.time() - start
 
@@ -400,6 +277,7 @@ def parse_catgt_fyi(fyi_path, toStream_id):
     events_list = []
     from_stream_index = []
     out_list = []
+    all_list = []
    
     with open(fyi_path, 'r') as reader:
         line = reader.readline()
@@ -411,6 +289,7 @@ def parse_catgt_fyi(fyi_path, toStream_id):
             if line.find('sync') == 0:                
                 # this is the path to a file of sync edges
                 curr_path = curr_path[0:len(curr_path)-1] # trim off cr on end
+                all_list.append(curr_path)
                 js, ip = parse_stream(stream_str)
                 if (js,ip) == toStream_id:
                     toStream_path = curr_path
@@ -422,6 +301,7 @@ def parse_catgt_fyi(fyi_path, toStream_id):
                 # this is the path to a file of event edges
                 # if it is not from the toStream, add to events, and out_list
                 curr_path = curr_path[0:len(curr_path)-1] # trim off cr on end
+                all_list.append(curr_path)
                 js, ip = parse_stream(stream_str)
                 if (js,ip) != toStream_id:
                     events_list.append(curr_path)
@@ -431,8 +311,81 @@ def parse_catgt_fyi(fyi_path, toStream_id):
                     out_list.append(os.path.join(cp.parent, curr_output_name))
             line = reader.readline()   
          
-    return toStream_path, from_list, from_list_ids, events_list, from_stream_index, out_list
+    return toStream_path, from_list, from_list_ids, events_list, from_stream_index, out_list, all_list
 
+
+def create_prbDir_list(run_directory, prb_dir_prefix):
+    # Make a list of all probe directories in run_directory
+    # used by create_PSTH_events to copy teh events file to each probe directory
+    
+    prb_fld_wild = prb_dir_prefix + '*'
+    prbDir_list = list()
+    for pDir in os.listdir(run_directory):
+        if fnmatch.fnmatch(pDir, prb_fld_wild):
+            prbDir_list.append(os.path.join(run_directory, pDir))
+
+    return prbDir_list
+
+
+def create_PSTH_events( all_list, out_list, prbDir_list, extract_str, sort_name ):
+    # For a user specified event set, create a csv file and copy to all kilosort
+    # output folders. Get a search string based on the extract_str provided by the user
+    ex_type, stream_index, prb_index, ex_name_str = catGT_ex_params_from_str(extract_str)
+    search_pat_adj = '*' + ex_name_str + '.adj.txt'
+    search_pat_orig = '*' + ex_name_str + '.txt'
+      
+    # check out_list for adjusted file
+    found = False
+    n_out = len(out_list)
+    n = 0
+    while not found and n < n_out:       
+        eventPath = out_list[n]
+        print(repr(n) + ': ' + eventPath)
+        if fnmatch.fnmatch(eventPath, search_pat_adj):
+            found = True
+        else:
+            n = n + 1
+    # if there isn't an adjusted file, get the path from list of all
+    n = 0
+    n_all = len(all_list)
+    while not found and n < n_all:
+        eventPath = all_list[n]
+        print(repr(n) + ': ' + eventPath)
+        if fnmatch.fnmatch(eventPath, search_pat_orig):
+            found = True
+        else:
+            n = n + 1 
+            
+    print(eventPath)
+    
+    if found:
+    # the CatGT extracted edge files are a single column with </n>
+    # event viewer needs .csv
+        edgeTimes = np.zeros((0), dtype='float')
+        with open(eventPath, 'r') as inFile:
+            line = inFile.readline()
+            while line != '':  # The EOF char is an empty string
+                currEdge = float(line)
+                edgeTimes = np.append(edgeTimes, currEdge)
+                line = inFile.readline()
+
+    # The output should be saved with the phy output, where the event viewer
+    # plugin can read it   
+        for pDir in prbDir_list: 
+            print(pDir)
+            im_pos = pDir.find('_imec')
+            prbStr = pDir[im_pos+5:len(pDir)]
+            phy_name = 'imec' + prbStr + '_' + sort_name
+            phy_dir = os.path.join(pDir, phy_name)
+            event_path = os.path.join(phy_dir, 'events.csv')
+            nEvent = len(edgeTimes)
+            with open(event_path, 'w') as outfile:
+                for i in range(0, nEvent-1):
+                    outfile.write(f'{edgeTimes[i]:.6f},')
+                outfile.write(f'{edgeTimes[nEvent-1]:.6f}')
+
+    return
+        
 
 def main():
 
@@ -442,10 +395,7 @@ def main():
     mod = ArgSchemaParser(schema_type=InputParameters,
                           output_schema_type=OutputParameters)
 
-    if mod.args['tPrime_helper_params']['tPrime_3A']:
-        output = call_TPrime_3A(mod.args)
-    else:
-        output = call_TPrime(mod.args)
+    output = call_TPrime(mod.args)
 
     output.update({"input_parameters": mod.args})
     if "output_json" in mod.args:

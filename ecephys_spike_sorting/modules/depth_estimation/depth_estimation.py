@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 from scipy.signal import welch
 from scipy.ndimage.filters import gaussian_filter1d
 
-from ...common.utils import find_range, rms, printProgressBar
-from ...common.OEFileInfo import get_lfp_channel_order
-from ...common.SGLXMetaToCoords import MetaToCoords
+from ecephys_spike_sorting.common.utils import find_range, rms, printProgressBar
+from ecephys_spike_sorting.common.OEFileInfo import get_lfp_channel_order
+from ecephys_spike_sorting.common.SGLXMetaToCoords import MetaToCoords
 
 def compute_channel_offsets(ap_data, ephys_params, params, xCoord, yCoord):
 
@@ -182,6 +182,9 @@ def find_surface_channel(lfp_data, ephys_params, params, xCoord, yCoord, shankIn
         'surface_y' : surface_y,
         'air_y' : air_y
     }
+    
+    print(repr(surface_y))
+    print(repr(output_dict))
 
     if save_figure:
         plot_results(chunk, 
@@ -210,6 +213,7 @@ def plot_results(chunk,
                  diff_thresh, 
                  figure_location):
 
+    print('first call to plt')
     plt.figure(figsize=(5,10))
     plt.subplot(4,1,1)
     # plt.imshow(np.flipud((chunk).T), aspect='auto',vmin=-1000,vmax=1000)

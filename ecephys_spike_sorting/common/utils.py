@@ -526,6 +526,16 @@ def catGT_ex_params_from_str(ex_str):
     # spaces between options in the command string, and these are
     # appended to the comma delimited string parsed here. 
     # Remove spaces before parsing
+    # stream names for each js
+    stream_name = []
+    stream_name.append('nidq')
+    stream_name.append('obx')
+    stream_name.append('imec')
+    stream_fileid = []
+    stream_fileid.append('.nidq.')
+    stream_fileid.append('.obx.')
+    stream_fileid.append('.ap.')
+    
     ex_str = ex_str.replace(' ','') #replace any spare spaces with commas
     
     eq_pos = ex_str.find('=')
@@ -549,6 +559,10 @@ def catGT_ex_params_from_str(ex_str):
             # name string = x(i)_word_<pulse_length>
             ex_parts[3] = ex_parts[5].replace('.', 'p')
             ex_name_str = ex_type + '_' + ex_parts[2] + '_' + ex_parts[5]
+        if stream_index == 0:
+            ex_name_str = stream_fileid[0] + ex_name_str
+        else:
+            ex_name_str = stream_name[stream_index] + repr(prb_index) + stream_fileid[stream_index] + ex_name_str
     else:
         # CatGT 2.5-like
         prb_index = 0      # for NI 

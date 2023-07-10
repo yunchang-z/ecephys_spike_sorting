@@ -72,8 +72,13 @@ def EphysParams(metaFullPath):
     num_channels = int(meta['nSavedChans'])
     
     uVPerBit = Chan0_uVPerBit(meta, probe_type)
+    
+    if 'snsGeomMap' in meta:
+        useGeom = True
+    else:
+        useGeom = False
       
-    return(probe_type, sample_rate, num_channels, uVPerBit)
+    return(probe_type, sample_rate, num_channels, uVPerBit, useGeom)
 
 # Return gain for imec channels.
 # Index into these with the original (acquired) channel IDs.
