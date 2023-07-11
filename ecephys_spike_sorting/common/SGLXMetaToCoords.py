@@ -332,8 +332,8 @@ def geomMapToGeom(meta):
     # parse header for number of shanks
     currList = geomMap[0].split(',')
     nShank = int(currList[1]);
-    shankWidth = float(currList[2]);
-    shankPitch = float(currList[3]);
+    shankPitch = float(currList[2]);
+    shankWidth = float(currList[3]);
     
     return nShank, shankWidth, shankPitch, shankInd, xCoord, yCoord, connected
 
