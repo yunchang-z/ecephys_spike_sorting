@@ -94,7 +94,7 @@ process_lf = False
 catGT_cmd_string = '-prb_fld -out_prb_fld -apfilter=butter,12,300,10000 -lffilter=butter,12,1,500 -gfix=0.4,0.10,0.02 '
 
 ni_present = True
-ni_extract_string = '-xa=0,0,0,1,3,500 -xia=0,0,1,3,3,0 -xd=0,0,-1,1,50 -xid=0,0,-1,2,1.7 -xid=0,0,-1,3,5 -xid=0,0,-1,3,5'
+ni_extract_string = '-xa=0,0,0,1,3,500 -xia=0,0,1,3,3,0 -xd=0,0,-1,1,50 -xid=0,0,-1,2,1.7 -xid=0,0,-1,3,5'
 
 
 
@@ -152,9 +152,9 @@ toStream_sync_params = 'ni' # should be ni, imec<probe index>. or obx<obx index>
 # ---------------
 # List of modules to run per probe; CatGT and TPrime are called once for each run.
 modules = [
-            #'kilosort_helper',
-            #'kilosort_postprocessing',
-            #'noise_templates',    
+            'kilosort_helper',
+            'kilosort_postprocessing',
+            #'noise_templates',  
             #'mean_waveforms',
             #'quality_metrics'
 			]
