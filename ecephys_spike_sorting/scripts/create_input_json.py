@@ -30,11 +30,13 @@ def createInputJson(output_file,
                     gate_string='0',
                     trigger_string='0,0',
                     probe_string='0',
+                    depth_est_fig = 0,
                     catGT_stream_string = '-ap',
                     catGT_car_mode = 'gbldmx',
                     catGT_loccar_min_um = 40,
                     catGT_loccar_max_um = 160,
                     catGT_cmd_string = '-prb_fld -out_prb_fld',
+                    catGT_maxZ_um = -1,
                     noise_template_use_rf = True,
                     event_ex_param_str = 'XD=4,1,50',
                     tPrime_im_ex_list = 'SY=0,384,6,500',
@@ -59,6 +61,7 @@ def createInputJson(output_file,
                     ks_templateRadius_um = 163,
                     ks_nblocks = 5,
                     ks_CAR = 0,
+                    ks_output_tag = 'ks2',
                     c_Waves_snr_um = 160,
                     wm_spread_thresh = 0.12,
                     wm_site_range = 16,
@@ -71,7 +74,7 @@ def createInputJson(output_file,
     
     # location of kilosor respository and kilosort version
 
-    kilosort_repository = r'C:\Users\colonellj\Documents\KS20_for_preprocessed_data'
+    kilosort_repository = r'C:\Users\colonellj\Documents\KS2_largetemplate\Kilosort2'
 
     KS2ver = '2.0'      # must equal '3.0', '2.5' or '2.0', and match the kiilosort_repository
     
@@ -118,10 +121,13 @@ def createInputJson(output_file,
         #
         # 
         if input_meta_path is not None:
-            probe_type, sample_rate, num_channels, uVPerBit = SpikeGLX_utils.EphysParams(input_meta_path)  
+            probe_type, sample_rate, num_channels, reference_channels, \
+            uVPerBit, useGeom = SpikeGLX_utils.EphysParams(input_meta_path) 
+            
             print('SpikeGLX params read from meta')
             print('probe type: {:s}, sample_rate: {:.5f}, num_channels: {:d}, uVPerBit: {:.4f}'.format\
                   (probe_type, sample_rate, num_channels, uVPerBit))
+            print('reference channels: ' + repr(reference_channels))
         
         #print('kilosort output directory: ' + kilosort_output_directory )
 
@@ -170,6 +176,8 @@ def createInputJson(output_file,
     fproc = os.path.join(kilosort_output_tmp,'temp_wh.dat') # full path for temp whitened data file
     fproc_forward_slash = fproc.replace('\\','/')
     fproc_str = "'" + fproc_forward_slash + "'"
+    
+    # Deduce sort outptut tag from kilosort_output_directory
     
      
     dictionary = \
@@ -220,7 +228,7 @@ def createInputJson(output_file,
         "depth_estimation_params" : {
             "hi_noise_thresh" : 50.0,
             "lo_noise_thresh" : 3.0,
-            "save_figure" : 1,
+            "save_figure" : depth_est_fig,
             "figure_location" : os.path.join(extracted_data_directory, 'probe_depth.png'),
             "smoothing_amount" : 5,
             "power_thresh" : 2.5,
@@ -307,14 +315,13 @@ def createInputJson(output_file,
         },
             
 
-# as implemented, "within_unit_overlap window" must be >= "between unit overlap window"
         "ks_postprocessing_params" : {
             "align_avg_waveform" : False,              
             "remove_duplicates" : True,
             "cWaves_path" : cWaves_path,
-            "within_unit_overlap_window" : 0.000333,
-            "between_unit_overlap_window" : 0.000333,
-            "between_unit_dist_um" : 42,
+            "within_unit_overlap_window" : 0.00017,
+            "between_unit_overlap_window" : 0.00041,
+            "between_unit_dist_um" : 66,
             "deletion_mode" : 'lowAmpCluster',
             "include_pcs" : include_pcs
         },
@@ -363,6 +370,10 @@ def createInputJson(output_file,
             "car_mode" : catGT_car_mode,
             "loccar_inner" : catGT_loccar_min_sites,
             "loccar_outer": catGT_loccar_max_sites,
+            "loccar_inner_um" : catGT_loccar_min_um,
+            "loccar_outer_um" : catGT_loccar_max_um,
+            "maxZ_um" : catGT_maxZ_um,
+            'useGeom' : useGeom,
             "cmdStr" : catGT_cmd_string,
             "catGTPath" : catGTPath
         },
@@ -376,7 +387,9 @@ def createInputJson(output_file,
                 "ni_sync_params" : niStream_sync_params,
                 "tPrime_3A" : tPrime_3A,
                 "toStream_path_3A" : toStream_path_3A,
-                "fromStream_list_3A" : fromStream_list_3A
+                "fromStream_list_3A" : fromStream_list_3A,
+                "psth_ex_str": event_ex_param_str,
+                "sort_out_tag": ks_output_tag
         },  
                 
         "psth_events": {

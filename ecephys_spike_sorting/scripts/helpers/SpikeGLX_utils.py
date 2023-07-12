@@ -77,8 +77,12 @@ def EphysParams(metaFullPath):
         useGeom = True
     else:
         useGeom = False
+        
+    # read shank map to get disabled (reference) channels
+    ref_channels = GetDisabledChan(meta, useGeom)
       
-    return(probe_type, sample_rate, num_channels, uVPerBit, useGeom)
+    return(probe_type, sample_rate, num_channels, ref_channels, uVPerBit, useGeom)
+
 
 # Return gain for imec channels.
 # Index into these with the original (acquired) channel IDs.
@@ -108,6 +112,31 @@ def Chan0_uVPerBit(meta, probe_type):
         uVPerBit = (1e6)*(1.2/APgain)/pow(2,10)
         
     return(uVPerBit)
+
+
+def GetDisabledChan(meta, useGeom):
+    
+    chanCountList = meta['snsApLfSy'].split(sep=',')
+    AP = int(chanCountList[0])
+    
+    if useGeom is True:
+        useMap = meta['snsGeomMap'].split(sep=')')
+    else:
+        useMap = meta['snsShankMap'].split(sep=')')
+        
+    # loop over known number of AP channels to avoid problems with
+    # extra entries in older data
+    connected = np.zeros((AP,)) 
+    for i in range(AP):
+        # get parameter list from this entry, skipping first header entry
+        currEntry = useMap[i+1]
+        currList = currEntry.split(sep=':')
+        connected[i] = int(currList[3]) 
+        
+    disabled_chan = np.where(connected==0)[0].tolist()
+    
+    return disabled_chan
+
 
 def ParseProbeStr(probe_string):
     
