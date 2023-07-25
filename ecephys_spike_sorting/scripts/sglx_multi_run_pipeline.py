@@ -72,7 +72,7 @@ catGT_dest = r'D:\SC048_out'
 # ------------
 # CatGT params
 # ------------
-run_CatGT = False   # set to False to sort/process previously processed data.
+run_CatGT = True   # set to False to sort/process previously processed data.
 
 
 # CAR mode for CatGT. Must be equal to 'None', 'gbldmx', 'gblcar' or 'loccar'
@@ -152,11 +152,12 @@ toStream_sync_params = 'ni' # should be ni, imec<probe index>. or obx<obx index>
 # ---------------
 # List of modules to run per probe; CatGT and TPrime are called once for each run.
 modules = [
+            'catGT_helper',
             'kilosort_helper',
             'kilosort_postprocessing',
             #'noise_templates',  
-            #'mean_waveforms',
-            #'quality_metrics'
+            'mean_waveforms',
+            'quality_metrics'
 			]
 
 json_directory = r'C:\Users\colonellj\Documents\ecephys_anaconda\json_files'
