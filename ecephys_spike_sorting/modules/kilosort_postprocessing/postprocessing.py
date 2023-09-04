@@ -75,7 +75,7 @@ def remove_double_counted_spikes(spike_times, spike_clusters, spike_templates,
     
     order = np.argsort(peak_channels)
     
-    unit_list = np.arange(order.size+1)
+    unit_list = np.arange(order.size)
     
     sorted_unit_list = unit_list[order]
 
@@ -120,7 +120,7 @@ def remove_double_counted_spikes(spike_times, spike_clusters, spike_templates,
 
         for_unit1 = np.where(spike_clusters == unit_id1)[0]
         
-        for idx2, unit_id2 in enumerate(unit_list[order]):
+        for idx2, unit_id2 in enumerate(sorted_unit_list):
             
             deltaX = np.squeeze(channel_pos[peak_chan_idx[unit_id2],0] - channel_pos[peak_chan_idx[unit_id1],0])
             deltaZ = np.squeeze(channel_pos[peak_chan_idx[unit_id2],1] - channel_pos[peak_chan_idx[unit_id1],1])
@@ -152,7 +152,7 @@ def remove_double_counted_spikes(spike_times, spike_clusters, spike_templates,
                                                                          include_pcs)
 #   build overlap summary 
     overlap_summary = np.zeros((num_clusters, 5), dtype=int )
-    for idx1, unit_id1 in enumerate(unit_list[order]):
+    for idx1, unit_id1 in enumerate(sorted_unit_list):
         overlap_summary[idx1,0] = unit_id1
         overlap_summary[idx1,1] = np.sum(spike_clusters == unit_id1)
         overlap_summary[idx1,2] = overlap_matrix[idx1,idx1]
