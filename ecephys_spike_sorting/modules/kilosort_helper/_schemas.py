@@ -62,6 +62,7 @@ class KilosortHelperParameters(DefaultSchema):
     ks_make_copy = Bool(required=False, default=False, help='If true, make a copy of the original KS output')
 
     surface_channel_buffer = Int(required=False, default=15, help='Number of channels above brain surface to include in spike sorting')
+    noise_threshold = Float(required=False, default=20., help='rms - median rms noise threhold, uV')
 
     matlab_home_directory = InputDir(help='Location from which Matlab files can be copied and run.')
     kilosort_repository = InputDir(help='Local directory for the Kilosort source code repository.')
