@@ -192,6 +192,15 @@ def ParseTrigStr(trigger_string, prb, gate, prb_folder):
     return first_trig, last_trig
 
 
+def ParseGateStr(gate_string):
+    str_list = gate_string.split(',')
+    first_gate = int(str_list[0])
+    if len(str_list) > 1:
+        last_gate = int(str_list[1])
+    else:
+        last_gate = first_gate
+    return first_gate, last_gate
+
 def ParseTcatName(tcat_name):    
     tcat_pos = tcat_name.find('tcat',0)
     baseName = tcat_name[0:tcat_pos-1]  #subtrace 1 from tcat pos to remove _

@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 
 from ...common.utils import catGT_ex_params_from_str
-
+from ecephys_spike_sorting.scripts.helpers import SpikeGLX_utils
 
 def call_TPrime(args):
 
@@ -32,8 +32,9 @@ def call_TPrime(args):
     start = time.time()
     
     # build paths to the input data for TPrime
+    first_gate, last_gate = SpikeGLX_utils.ParseGateStr(args['catGT_helper_params']['gate_string'])
     catGT_dest = args['directories']['extracted_data_directory']
-    run_name = args['catGT_helper_params']['run_name'] + '_g' + args['catGT_helper_params']['gate_string']
+    run_name = args['catGT_helper_params']['run_name'] + '_g' + str(first_gate)
     run_dir_name = 'catgt_' + run_name
     prb_dir_prefix = run_name + '_imec'
     

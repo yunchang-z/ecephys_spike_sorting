@@ -49,7 +49,7 @@ npx_directory = r'D:\SC048_in'
 
 # Each run_spec is a list of 4 strings:
 #   undecorated run name (no g/t specifier, the run field in CatGT)
-#   gate index, as a string (e.g. '0')
+#   gate index or range of gate indicies, as a string (e.g. '0')
 #   triggers to process/concatenate, as a string e.g. '0,400', '0,0 for a single file
 #           can replace first limit with 'start', last with 'end'; 'start,end'
 #           will concatenate all trials in the probe folder
@@ -58,7 +58,7 @@ npx_directory = r'D:\SC048_in'
 #           these strings must match a key in the param dictionaries above.
 
 run_specs = [									
-						['SC048_122920_ex', '0', '0,0', '0:1', ['cortex','cortex','cortex'] ]
+						['SC048_122920_ex', '0,1', '0,0', '0', ['cortex','cortex'] ]
 ]
 
 # ------------------
@@ -156,8 +156,8 @@ modules = [
             'kilosort_helper',
             'kilosort_postprocessing',
             #'noise_templates',  
-            'mean_waveforms',
-            'quality_metrics'
+            #'mean_waveforms',
+            #'quality_metrics'
 			]
 
 json_directory = r'C:\Users\colonellj\Documents\ecephys_anaconda\json_files'
@@ -203,13 +203,30 @@ for spec in run_specs:
     # Make list of probes from the probe string
     prb_list = SpikeGLX_utils.ParseProbeStr(spec[3])
     
-    # build path to the first probe folder; look into that folder
-    # to determine the range of trials if the user specified t limits as
-    # start and end
-    run_folder_name = spec[0] + '_g' + spec[1]
+    [first_gate, last_gate] = SpikeGLX_utils.ParseGateStr(spec[1])
+    run_folder_name = spec[0] + '_g' + repr(first_gate)
     prb0_fld_name = run_folder_name + '_imec' + prb_list[0]
     prb0_fld = os.path.join(npx_directory, run_folder_name, prb0_fld_name)
-    first_trig, last_trig = SpikeGLX_utils.ParseTrigStr(spec[2], prb_list[0], spec[1], prb0_fld)
+    first_trig, last_trig = SpikeGLX_utils.ParseTrigStr(spec[2], prb_list[0], str(first_gate), prb0_fld)
+    
+    if last_gate > first_gate:
+        # loop over other gates to check ranges of triggers 
+        # If your gates have varying numbers of triggers, make sure to set
+        # 't_miss_ok' in the catGT_cmd_string above
+        for gate_index in range(first_gate + 1, last_gate+1):
+            # build path to the first probe folder for each gate; look into that folder
+            # to determine the range of trials if the user specified t limits as
+            # start and end
+            run_folder_name = spec[0] + '_g' + repr(first_gate)
+            prb0_fld_name = run_folder_name + '_imec' + prb_list[0]
+            prb0_fld = os.path.join(npx_directory, run_folder_name, prb0_fld_name)
+            curr_first, curr_last = SpikeGLX_utils.ParseTrigStr(spec[2], prb_list[0], str(gate_index), prb0_fld)
+            if curr_first < first_trig:
+                first_trig = curr_first
+            if curr_last > last_trig:
+                last_trig = curr_last
+    
+    
     trigger_str = repr(first_trig) + ',' + repr(last_trig)
     
     # loop over all probes to build json files of input parameters
@@ -248,7 +265,7 @@ for spec in run_specs:
         
         # build name of first trial to be concatenated/processed;
         # allows reaidng of the metadata
-        run_str = spec[0] + '_g' + spec[1] 
+        run_str = spec[0] + '_g' + str(first_gate) 
         run_folder = run_str
         prb_folder = run_str + '_imec' + prb
         input_data_directory = os.path.join(npx_directory, run_folder, prb_folder)
@@ -284,7 +301,7 @@ for spec in run_specs:
         
         
         # location of the binary created by CatGT, using -out_prb_fld
-        run_str = spec[0] + '_g' + spec[1]
+        run_str = spec[0] + '_g' + str(first_gate)
         run_folder = 'catgt_' + run_str
         prb_folder = run_str + '_imec' + prb
         data_directory.append(os.path.join(catGT_dest, run_folder, prb_folder))

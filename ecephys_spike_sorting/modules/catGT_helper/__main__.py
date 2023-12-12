@@ -9,6 +9,8 @@ import numpy as np
 from pathlib import Path
 
 from ...common.utils import read_probe_json, get_repo_commit_date_and_hash, rms
+from ecephys_spike_sorting.scripts.helpers import SpikeGLX_utils
+
 
 def run_CatGT(args):
 
@@ -84,8 +86,10 @@ def run_CatGT(args):
     logPath = os.getcwd()
     logName = 'CatGT.log'
    
+    first_gate, last_gate = SpikeGLX_utils.ParseGateStr(args['catGT_helper_params']['gate_string'])
          
-    catgt_runName = 'catgt_' + args['catGT_helper_params']['run_name'] + '_g' + args['catGT_helper_params']['gate_string']
+    catgt_runName = 'catgt_' + args['catGT_helper_params']['run_name'] + '_g' + str(first_gate)
+
     
     # build name for log copy
     catgt_logName = catgt_runName
@@ -102,7 +106,7 @@ def run_CatGT(args):
                     os.path.join(catgt_runDir,catgt_logName))
     
     # if an fyi file was created, check if there is aleady an 'all_fyi.txt'
-    run_name = args['catGT_helper_params']['run_name'] + '_g' + args['catGT_helper_params']['gate_string']
+    run_name = args['catGT_helper_params']['run_name'] + '_g' + str(first_gate)
     fyi_path = os.path.join(catgt_runDir, (run_name + '_fyi.txt'))
     all_fyi_path =  os.path.join(catgt_runDir, (run_name + '_all_fyi.txt'))
     temp_path = os.path.join(catgt_runDir, 'temp.txt')
