@@ -58,7 +58,7 @@ npx_directory = r'D:\SC048_in'
 #           these strings must match a key in the param dictionaries above.
 
 run_specs = [									
-						['SC048_122920_ex', '0,1', '0,0', '0', ['cortex','cortex'] ]
+						['SC048_122920_ex', '0', '0,0', '0', ['cortex','cortex'] ]
 ]
 
 # ------------------
@@ -156,8 +156,8 @@ modules = [
             'kilosort_helper',
             'kilosort_postprocessing',
             #'noise_templates',  
-            #'mean_waveforms',
-            #'quality_metrics'
+            'mean_waveforms',
+            'quality_metrics'
 			]
 
 json_directory = r'C:\Users\colonellj\Documents\ecephys_anaconda\json_files'
