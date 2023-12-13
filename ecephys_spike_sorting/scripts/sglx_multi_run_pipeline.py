@@ -150,9 +150,9 @@ toStream_sync_params = 'ni' # should be ni, imec<probe index>. or obx<obx index>
 # ---------------
 # Modules List
 # ---------------
-# List of modules to run per probe; CatGT and TPrime are called once for each run.
-modules = [
-            'catGT_helper',
+# List of modules to run per probe; CatGT and TPrime are called once for each run,
+# and should not be included here.
+modules = [            
             'kilosort_helper',
             'kilosort_postprocessing',
             #'noise_templates',  
@@ -264,7 +264,7 @@ for spec in run_specs:
             catGT_stream_string = catGT_stream_string + ' -lf'
         
         # build name of first trial to be concatenated/processed;
-        # allows reaidng of the metadata
+        # allows reading of the metadata
         run_str = spec[0] + '_g' + str(first_gate) 
         run_folder = run_str
         prb_folder = run_str + '_imec' + prb
