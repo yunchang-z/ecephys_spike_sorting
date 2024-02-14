@@ -72,20 +72,20 @@ def createInputJson(output_file,
                     ):
 
     # hard coded paths to code on your computer and system
-    ecephys_directory = r'C:\Users\colonellj\Documents\ecephys_anaconda\ecephys_spike_sorting\ecephys_spike_sorting'
+    ecephys_directory = r'C:\Users\colonellj\Documents\021124_test_install\ecephys_spike_sorting\ecephys_spike_sorting'
     
     # location of kilosor respository and kilosort version
 
-    kilosort_repository = r'C:\Users\colonellj\Documents\KS25_release'
+    kilosort_repository = r'C:\Users\colonellj\Documents\KS3'
 
-    KS2ver = '2.5'      # must equal '3.0', '2.5' or '2.0', and match the kiilosort_repository
+    KS2ver = '3.0'      # must equal '3.0', '2.5' or '2.0', and match the kiilosort_repository
     
     # KS 3.0 does not yet output pcs.
     if KS2ver == '3.0':
         include_pcs = False  # set to false for KS2ver = '3.0'
     
     npy_matlab_repository = r'C:\Users\colonellj\Documents\npy-matlab-master'
-    catGTPath = r'C:\Users\colonellj\Documents\CatGT-win-41'
+    catGTPath = r'C:\Users\colonellj\Documents\CatGT-win'
     tPrime_path=r'C:\Users\colonellj\Documents\TPrime-win'
     cWaves_path=r'C:\Users\colonellj\Documents\C_Waves-win'
     
@@ -165,7 +165,7 @@ def createInputJson(output_file,
     
     # nNeighbors is the number of sites kilosort includes in a template.
     # Calculate the number of sites within that radisu.
-    maxNeighbors = 64 # 64 for standard build of KS
+    maxNeighbors = 32 # 64 for standard build of KS
     nrows = np.sqrt((np.square(ks_templateRadius_um) - np.square(hpitch.get(probe_type))))/vpitch.get(probe_type)
     ks_nNeighbors = int(round(2*nrows*nColumn.get(probe_type)))
     

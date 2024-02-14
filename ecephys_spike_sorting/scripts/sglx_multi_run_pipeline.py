@@ -398,6 +398,7 @@ for spec in run_specs:
                                            spikeGLX_data = True,
                                            input_meta_path = input_meta_fullpath,
                                            catGT_run_name = spec[0],
+                                           gate_string = spec[1],
     									   kilosort_output_directory=kilosort_output_dir,
                                            extracted_data_directory = catGT_dest,                                           
                                            tPrime_ni_ex_list = ni_extract_string,
