@@ -45,7 +45,7 @@ logName = 'SC048_log.csv'
 
 # Raw data directory = npx_directory
 # run_specs = name, gate, trigger and probes to process
-npx_directory = r'D:\SC048_in'
+npx_directory = r'//prfs/apig/jic/SC048'
 
 # Each run_spec is a list of 4 strings:
 #   undecorated run name (no g/t specifier, the run field in CatGT)
@@ -58,7 +58,7 @@ npx_directory = r'D:\SC048_in'
 #           these strings must match a key in the param dictionaries above.
 
 run_specs = [									
-						['SC048_122920_ex', '0', '0,0', '0', ['cortex','cortex'] ]
+						['SC048_122920_ex', '0', '0,0', '0:1', ['cortex','cortex','thalamus'] ]
 ]
 
 # ------------------
@@ -67,7 +67,7 @@ run_specs = [
 # Set to an existing directory; all output will be written here.
 # Output will be in the standard SpikeGLX directory structure:
 # run_folder/probe_folder/*.bin
-catGT_dest = r'D:\SC048_out'
+catGT_dest = r'//prfs/apig/jic/SC048_out'
 
 # ------------
 # CatGT params
@@ -134,7 +134,8 @@ c_Waves_snr_um = 160
 # ----------------------
 # extract param string for psth events -- copy the CatGT params used to extract
 # events that should be exported with the phy output for PSTH plots
-# If not using, remove psth_events from the list of modules
+# This funciton now happens in TPrime
+# If not using set to an empty string
 event_ex_param_str = 'xd=0,0,-1,1,50'
 
 # -----------------
@@ -279,7 +280,6 @@ for spec in run_specs:
         info = createInputJson(catGT_input_json[i], npx_directory=npx_directory, 
                                        continuous_file = continuous_file,
                                        kilosort_output_directory=catGT_dest,
-                                       spikeGLX_data = True,
                                        input_meta_path = input_meta_fullpath,
                                        catGT_run_name = spec[0],
                                        gate_string = spec[1],
@@ -330,7 +330,6 @@ for spec in run_specs:
 
         info = createInputJson(module_input_json[i], npx_directory=npx_directory, 
 	                                   continuous_file = continuous_file,
-                                       spikeGLX_data = True,
                                        input_meta_path = input_meta_fullpath,
 									   kilosort_output_directory=kilosort_output_dir,
                                        ks_make_copy = ks_make_copy,
@@ -395,7 +394,6 @@ for spec in run_specs:
         
         info = createInputJson(input_json, npx_directory=npx_directory, 
     	                                   continuous_file = continuous_file,
-                                           spikeGLX_data = True,
                                            input_meta_path = input_meta_fullpath,
                                            catGT_run_name = spec[0],
                                            gate_string = spec[1],
@@ -405,9 +403,6 @@ for spec in run_specs:
                                            event_ex_param_str = event_ex_param_str,
                                            sync_period = 1.0,
                                            toStream_sync_params = toStream_sync_params,
-                                           tPrime_3A = False,
-                                           toStream_path_3A = ' ',
-                                           fromStream_list_3A = list(),
                                            ks_output_tag = ks_output_tag
                                            ) 
         

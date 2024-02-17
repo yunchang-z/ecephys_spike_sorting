@@ -25,7 +25,7 @@ def createInputJson(output_file,
                     extracted_data_directory=None,
                     kilosort_output_directory=None,
                     ks_make_copy=False,
-                    probe_type='3A',
+                    probe_type='',
                     catGT_run_name='test',
                     gate_string='0',
                     trigger_string='0,0',
@@ -35,15 +35,15 @@ def createInputJson(output_file,
                     catGT_car_mode = 'gbldmx',
                     catGT_loccar_min_um = 40,
                     catGT_loccar_max_um = 160,
-                    catGT_cmd_string = '-prb_fld -out_prb_fld',
+                    catGT_cmd_string = '',
                     catGT_maxZ_um = -1,
                     noise_template_use_rf = True,
-                    event_ex_param_str = 'XD=4,1,50',
-                    tPrime_im_ex_list = 'SY=0,384,6,500',
-                    tPrime_ni_ex_list = 'XA=0,1,3,500',
+                    event_ex_param_str = '',
+                    tPrime_im_ex_list = '',
+                    tPrime_ni_ex_list = '',
                     sync_period = 1.0,
-                    toStream_sync_params = 'SY=0,384,6,500',
-                    niStream_sync_params = 'XA=0,1,3,500',
+                    toStream_sync_params = '',
+                    niStream_sync_params = '',
                     tPrime_3A = False,
                     toStream_path_3A = ' ',
                     fromStream_list_3A = list(),
@@ -184,9 +184,7 @@ def createInputJson(output_file,
     fproc = os.path.join(kilosort_output_tmp,'temp_wh.dat') # full path for temp whitened data file
     fproc_forward_slash = fproc.replace('\\','/')
     fproc_str = "'" + fproc_forward_slash + "'"
-    
-    # Deduce sort outptut tag from kilosort_output_directory
-    
+       
      
     dictionary = \
     {
