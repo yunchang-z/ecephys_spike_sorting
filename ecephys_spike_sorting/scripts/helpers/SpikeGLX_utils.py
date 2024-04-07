@@ -80,8 +80,45 @@ def EphysParams(metaFullPath):
         
     # read shank map to get disabled (reference) channels
     ref_channels = GetDisabledChan(meta, useGeom)
-      
-    return(probe_type, sample_rate, num_channels, ref_channels, uVPerBit, useGeom)
+    
+    xCoord, yCoord, shankInd = SGLXMeta.MetaToCoords(metaPath,-1)
+    sh, sh_counts = np.unique(shankInd, return_counts=True)
+    # get vpitch, hpitch, nColumn from shank with the largest numbers of sites
+    sh_mode = sh[np.argmax(sh_counts)]
+    sh_mode_sites = np.squeeze( np.argwhere(shankInd == sh_mode))
+    x_sh = xCoord[sh_mode_sites]
+    y_sh = yCoord[sh_mode_sites]
+    nColumn = len(np.unique(x_sh))    
+    
+    # NP 1.0 staggered patterns have been historically as 2 columns. These can
+    # be tricky to identify from the coorindates alone AND there are some type 0 
+    # probes that are NOT staggered.
+    vpitch = 0
+    hpitch = 0
+    stag_types = ['3A', 'NP1', 'NP1200', 'NP1210', 'NP1020', 'NP1021', 'NP1030', 'NP1031']
+    if (probe_type in stag_types) and (nColumn == 4):
+        nColumn = 2
+        vpitch = 20  # happens to be true for all staggered configurations
+        if probe_type in ['NP1020', 'NP1021', 'NP1030', 'NP1031']:
+            hpitch = 87
+        else:
+            hpitch = 32
+    else:
+        # these are linear or square pattern probes        
+        xval, xval_counts = np.unique(x_sh, return_counts=True)        
+        xval_mode = xval[np.argmax(xval_counts)]
+        xval_mode_sites = np.squeeze( np.argwhere(x_sh == xval_mode))        
+        yval_col = y_sh[xval_mode_sites]        
+        if len(yval_col) > 1:
+            ydiff = np.diff(np.sort(yval_col))
+            ydiffval, ydiff_counts = np.unique(ydiff, return_counts=True)
+            vpitch = ydiff[np.argmax(ydiff_counts)]
+        if len(xval) > 1:
+            xdiff = np.diff(np.sort(xval))
+            xdiffval, xdiff_counts = np.unique(xdiff, return_counts=True)
+            hpitch = xdiff[np.argmax(xdiff_counts)]
+    
+    return(probe_type, sample_rate, num_channels, ref_channels, uVPerBit, vpitch, hpitch, nColumn, useGeom)
 
 
 # Return gain for imec channels.

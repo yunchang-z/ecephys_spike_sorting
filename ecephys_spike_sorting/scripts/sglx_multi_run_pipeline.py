@@ -8,7 +8,7 @@ from helpers import run_one_probe
 from create_input_json import createInputJson
 
 
-# script to run CatGT, KS2, postprocessing and TPrime on data collected using
+# script to run CatGT, kilosort, postprocessing and TPrime on data collected using
 # SpikeGLX. The construction of the paths assumes data was saved with
 # "Folder per probe" selected (probes stored in separate folders) AND
 # that CatGT is run with the -out_prb_fld option
@@ -19,6 +19,15 @@ from create_input_json import createInputJson
 # -------------------------------
 # -------------------------------
 
+# Note that setting ks_ver ONLY sets up the output tag and threshold values.
+# To run a specific MATLAB KS, make sure to set the kilosort_repository in 
+# create_input_json; in the module list, call 'kilosort helper'
+# To run KS4, use an anaconda install and call 'ks4_helper'
+
+ks_ver = '2.0'  # needs to be one of: '2.0', '2.5', '3.0', or '4'
+ksTag_dict = {'2.0':'ks2', '2.5':'ks25', '3.0':'ks3', '4':'ks4'}
+ks_output_tag = 'ks4'
+
 # brain region specific params
 # can add a new brain region by adding the key and value for each param
 # can add new parameters -- any that are taken by create_input_json --
@@ -28,12 +37,26 @@ from create_input_json import createInputJson
 
 refPerMS_dict = {'default': 2.0, 'cortex': 2.0, 'medulla': 1.5, 'thalamus': 1.0}
 
+ksTag_dict = {'2.0':'ks2', '2.5':'ks25', '3.0':'ks3', '4':'ks4'}
+
+ks_output_tag = 'ks4'
+
 # threhold values appropriate for KS2, KS2.5
-ksTh_dict = {'default':'[10,4]', 'cortex':'[10,4]', 'medulla':'[10,4]', 'thalamus':'[10,4]'}
+ksTh2_dict = {'default':'[10,4]', 'cortex':'[10,4]', 'medulla':'[10,4]', 'thalamus':'[10,4]'}
 # threshold values appropriate for KS3.0
-#ksTh_dict = {'default':'[9,9]', 'cortex':'[9,9]', 'medulla':'[9,9]', 'thalamus':'[9,9]'}
+ksTh3_dict = {'default':'[9,9]', 'cortex':'[9,9]', 'medulla':'[9,9]', 'thalamus':'[9,9]'}
+# threshold values appropriate for KS4.0
+ksTh4_dict = {'default':'[8,9]', 'cortex':'[8,9]', 'medulla':'[8,9]', 'thalamus':'[8,9]'}
 
-
+if ks_ver == '2.0' or ks_ver == '2.5':
+    ksTh_dict = ksTh2_dict
+elif ks_ver == '3.0':    
+    ksTh_dict = ksTh3_dict
+elif ks_ver == '4':
+    ksTh_dict = ksTh4_dict
+else:
+    print('unknown version of ks, exiting.')
+    sys.exit()
 
 # -----------
 # Input data
@@ -41,11 +64,11 @@ ksTh_dict = {'default':'[10,4]', 'cortex':'[10,4]', 'medulla':'[10,4]', 'thalamu
 # Name for log file for this pipeline run. Log file will be saved in the
 # output destination directory catGT_dest
 # If this file exists, new run data is appended to it
-logName = 'SC048_log.csv'
+logName = 'pipeline_test_log.csv'
 
 # Raw data directory = npx_directory
 # run_specs = name, gate, trigger and probes to process
-npx_directory = r'//prfs/apig/jic/SC048'
+npx_directory = r'D:\pipeline_test_data'
 
 # Each run_spec is a list of 4 strings:
 #   undecorated run name (no g/t specifier, the run field in CatGT)
@@ -58,7 +81,7 @@ npx_directory = r'//prfs/apig/jic/SC048'
 #           these strings must match a key in the param dictionaries above.
 
 run_specs = [									
-						['SC048_122920_ex', '0', '0,0', '0:1', ['cortex','cortex','thalamus'] ]
+						['ANM487558_061522_crosstalkrun_tip_ex', '0', '0,0', '0', ['cortex','thalamus','thalamus'] ]
 ]
 
 # ------------------
@@ -67,7 +90,7 @@ run_specs = [
 # Set to an existing directory; all output will be written here.
 # Output will be in the standard SpikeGLX directory structure:
 # run_folder/probe_folder/*.bin
-catGT_dest = r'//prfs/apig/jic/SC048_out'
+catGT_dest = r'D:\pipeline_test_out'
 
 # ------------
 # CatGT params
@@ -98,21 +121,31 @@ ni_extract_string = '-xa=0,0,0,1,3,500 -xia=0,0,1,3,3,0 -xd=0,0,-1,1,50 -xid=0,0
 
 
 
-# ----------------------
-# KS2 or KS25 parameters
-# ----------------------
+# --------------------------
+# KS2, KS2.5, KS3 parameters
+# --------------------------
 # parameters that will be constant for all recordings
 # Template ekmplate radius and whitening, which are specified in um, will be 
 # translated into sites using the probe geometry.
-ks_remDup = 0
-ks_saveRez = 1
-ks_copy_fproc = 0
-ks_templateRadius_um = 163
-ks_whiteningRadius_um = 163
-ks_minfr_goodchannels = 0.1
+ks_remDup = 0       # used by KS2, 2.5, 3
+ks_saveRez = 1      # used by KS2, 2.5, 3
+ks_copy_fproc = 0   # used by 2.5, 3, to save drift corrected binary
+ks_templateRadius_um = 163    # used by KS2, 2.5, 3
+ks_whiteningRadius_um = 163   # used by KS2, 2,5 2.5, 3
+ks_minfr_goodchannels = 0.1   # used by KS2, 2.5, 3; set to 0 for KS2.5 and 3
+
+# -------------------------------
+# KS2, KS2.5, KS3, KS4 parameters
+# -------------------------------
 ks_CAR = 0          # CAR already done in catGT
-ks_nblocks = 1      # for KS2.5 and KS3; 1 for rigid registration in drift correction, 
+ks_nblocks = 6      # for KS2.5 KS3, and KS4; 1 for rigid registration in drift correction, 
                     # higher numbers to allow different drift for different 'blocks' of the probe
+
+# -------------------------------------------------------
+# KS4 specific parameters -- these are the default values
+# -------------------------------------------------------
+ks4_duplicate_spike_bins = 15
+ks4_min_template_size_um = 10
 
 # If running KS20_for_preprocessed_data:
 # (https://github.com/jenniferColonell/KS20_for_preprocessed_data)
@@ -121,7 +154,7 @@ ks_nblocks = 1      # for KS2.5 and KS3; 1 for rigid registration in drift corre
 # This parameter is not implemented in standard versions of kilosort.
 ks_doFilter = 0
 
-ks_output_tag = 'ks2'
+
 
 
 # ----------------------
@@ -141,7 +174,7 @@ event_ex_param_str = 'xd=0,0,-1,1,50'
 # -----------------
 # TPrime parameters
 # -----------------
-runTPrime = True   # set to False if not using TPrime
+runTPrime = False   # set to False if not using TPrime
 sync_period = 1.0   # true for SYNC wave generated by imec basestation
 toStream_sync_params = 'ni' # should be ni, imec<probe index>. or obx<obx index>
 
@@ -161,7 +194,16 @@ modules = [
             'quality_metrics'
 			]
 
-json_directory = r'C:\Users\colonellj\Documents\ecephys_anaconda\json_files'
+if ks_ver in ['2.0','2.5','3.0'] and 'kilosort_helper' not in modules:
+    print('For MATLAB versions of KS, run kilosort_helper module')
+    sys.exit()
+if ks_ver == '4' and 'ks4_helper' not in modules:
+    print('For kilsort 4, run ks4_helper module')
+    sys.exit()
+    
+
+
+json_directory = r'C:\Users\labadmin\Documents\ecephys_anaconda\ecephys_json'
 
 # -----------------------
 # -----------------------
@@ -244,9 +286,9 @@ for spec in run_specs:
     
     for i, prb in enumerate(prb_list):
             
-        #create CatGT command for this probe
+        
         print('Creating json file for CatGT on probe: ' + prb)
-        # Run CatGT
+        #create CatGT command for this probe
         catGT_input_json.append(os.path.join(json_directory, spec[0] + prb + '_CatGT' + '-input.json'))
         catGT_output_json.append(os.path.join(json_directory, spec[0] + prb + '_CatGT' + '-output.json'))
         
@@ -295,11 +337,11 @@ for spec in run_specs:
         
         
         #create json files for the other modules
+        print('Creating json file for sorting on probe: ' + prb) 
         session_id.append(spec[0] + '_imec' + prb)
         
         module_input_json.append(os.path.join(json_directory, session_id[i] + '-input.json'))
-        
-        
+            
         # location of the binary created by CatGT, using -out_prb_fld
         run_str = spec[0] + '_g' + str(first_gate)
         run_folder = 'catgt_' + run_str
@@ -336,7 +378,8 @@ for spec in run_specs:
                                        noise_template_use_rf = False,
                                        catGT_run_name = session_id[i],
                                        gate_string = spec[1],
-                                       probe_string = spec[3],  
+                                       probe_string = spec[3],
+                                       ks_ver = ks_ver,
                                        ks_remDup = ks_remDup,                   
                                        ks_finalSplits = 1,
                                        ks_labelGood = 1,
@@ -354,7 +397,9 @@ for spec in run_specs:
                                        extracted_data_directory = data_directory[i],
                                        event_ex_param_str = event_ex_param_str,
                                        c_Waves_snr_um = c_Waves_snr_um,                               
-                                       qm_isi_thresh = refPerMS/1000
+                                       qm_isi_thresh = refPerMS/1000,
+                                       ks4_duplicate_spike_bins = ks4_duplicate_spike_bins,
+                                       ks4_min_template_size_um = ks4_min_template_size_um
                                        )   
 
         # copy json file to data directory as record of the input parameters 

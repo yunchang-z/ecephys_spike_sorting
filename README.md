@@ -29,7 +29,7 @@ Further documentation can be found in each module's README file. For more inform
 
 1. [catGT_helper](ecephys_spike_sorting/modules/catGT_helper/README.md): Concatenates trials, applies filters, removes artifacts in neural data. Finds edges in sync and auxiliary channels.
 
-2. [kilosort_helper](ecephys_spike_sorting/modules/kilosort_helper/README.md): Generates config files for Kilosort based on SpikeGLX metadata and launches spike sorting via the Matlab engine. [pykilosort helper]((ecephys_spike_sorting/modules/pykilosort_helper/README.md) runs the IBL version of pykilosort; the only changes in fork used in this pipeline are to allow completely skipping filtering and CAR, because these functions are handled in CatGT.
+2. [kilosort_helper](ecephys_spike_sorting/modules/kilosort_helper/README.md): Generates config files for MATLAB versions of Kilosort based on SpikeGLX metadata and launches spike sorting via the Matlab engine. [ks4_helper] runs the python-based Kilosort 4. [pykilosort helper]((ecephys_spike_sorting/modules/pykilosort_helper/README.md) runs the IBL version of pykilosort; the only changes in fork used in this pipeline are to allow completely skipping filtering and CAR, because these functions are handled in CatGT. 
 
 3. [kilosort_postprocessing](ecephys_spike_sorting/modules/kilosort_postprocessing/README.md): Removes putative double-counted spikes from Kilosort output. The algorithm has been changed from the original to delete all between cluster duplicates from the cluster with lower amplitude.
 
@@ -59,7 +59,9 @@ These modules have been tested with Python 3.8.10 and 3.9.
 
 If you only plan to use only the MATLAB version of Kilosort, you can install and run using the procedure recommended by the original authors at the Allen Institute, which uses [pipenv](https://github.com/pypa/pipenv).
 
-If you want to run pykilosort, or just prefer Anaconda, please skip down to [Installation with Anaconda](#Installation-with-Anaconda).
+If you want to run Kilosort4 or pykilosort, or just prefer Anaconda, please skip down to [# Installation with Anaconda and Kilosort4
+](# Installation with Anaconda and Kilosort4) [# Installation with Anaconda and pykilosort
+](# Installation with Anaconda and pykilosort). 
 
 All of the components of the SpikeGLX pipeline are available in Windows and Linux, but the pipeline has only been tested in Windows. These instructions are for Windows 10.
 
@@ -96,7 +98,7 @@ In the command window navigate to the ecephys_spike_sorting directory at the top
 
 cd \Users\labadmin\Documents\ecephys_clone\ecephys_spike_sorting
 
-Build the environment -- it will use the Pipfile located in this directory, and create the virtual environment in the local directory. Currently (May 2023) the latest version of setuptools appears to not function with installation of MATLAB, so after the install, we activate the environment and use pip to uninstall setuptools and install 59.8.0.  Finally, install the ecephys code in the environment.
+Build the environment -- it will use the Pipfile located in this directory, and create the virtual environment in the local directory. Currently (April 2024) the latest version of setuptools appears to not function with installation of MATLAB, so after the install, we activate the environment and use pip to uninstall setuptools and install 59.8.0.  Finally, install the ecephys code in the environment.
 
 ```shell
     $ set PIPENV_VENV_IN_PROJECT=1
@@ -136,7 +138,43 @@ NOTE: This install needs to be repeated whenenver the virtual environment is reb
 
 After completing the install, close the command window and reopen as a normal user (not administrator) to run scripts.
 
-# Installation with Anaconda
+# Installation with Anaconda and Kilosort4
+
+These instructions are to build an environment compatible with KS4 and MATLAB versions of Kilosort. The instructions are adapated from the Kilosort4 github (https://github.com/MouseLand/Kilosort)
+
+If not already present, install Miniconda with python 3.9 (https://docs.conda.io/en/latest/miniconda.html).
+
+As with pipenv, to be compatible with versions of MATLAB < R2021, install an earlier version of setuptools:
+
+```shell
+pip uninstall setuptools
+pip install setuptools==59.8.0
+```
+
+Install Kilosort 4 and pytorch:
+
+```shell
+conda create --name kilosort python=3.9
+pip uninstall torch
+conda install pytorch pytorch-cuda=11.8 -c pytorch -c nvidia
+```
+
+It's a good idea at this point to run a small test dataset through the kilosort gui. There are tips for debugging issues with the pytorch installation in the KS4 readme.
+
+Next install ecephys. To force the correct versions of some components, they must be uninstalled and reinstalled manually. This will be corrected in a later verison. From the anaconda prompt, navigate to the ecephys_spike_sorting directory (containing setup.py) and run the commands:
+
+```shell
+pip install -e .
+pip uninstall argschema
+pip install argschema==1.17.5
+pip uninstall marshmallow
+pip install marshmallow==2.19.2
+pip install h5py
+```
+To run the MATLAB versions of Kilosort in this environment, follow the instruction below in [### Set up to run MATLAB from Python in Anconda](### Set up to run MATLAB from Python in Anconda)
+
+
+# Installation with Anaconda and pykilosort
 
 Ensure that CUDA Toolkit 11.2 or later is installed. The pipeline is currently tested with 11.2.
 
