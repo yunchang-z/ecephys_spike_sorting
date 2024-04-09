@@ -60,7 +60,7 @@ These modules have been tested with Python 3.8.10 and 3.9.
 If you only plan to use only the MATLAB version of Kilosort, you can install and run using the procedure recommended by the original authors at the Allen Institute, which uses [pipenv](https://github.com/pypa/pipenv).
 
 If you want to run Kilosort4 or pykilosort, or just prefer Anaconda, please skip down to [Installation with Anaconda and Kilosort4
-](Installation-with-Anaconda-and-Kilosort4) [# Installation with Anaconda and pykilosort
+](Installation-with-Anaconda-and-Kilosort4) or [Installation with Anaconda and pykilosort
 ](Installation-with-Anaconda-and-pykilosort). 
 
 All of the components of the SpikeGLX pipeline are available in Windows and Linux, but the pipeline has only been tested in Windows. These instructions are for Windows 10.
