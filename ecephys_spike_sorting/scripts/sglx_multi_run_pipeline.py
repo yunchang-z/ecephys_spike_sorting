@@ -77,7 +77,7 @@ npx_directory = r'D:\pipeline_test_data'
 #           these strings must match a key in the param dictionaries above.
 
 run_specs = [									
-						['ANM487558_061522_crosstalkrun_tip_ex', '0', '0,0', '0', ['cortex','thalamus','thalamus'] ]
+						['SC048_122920_ex', '0', '0,0', '0:2', ['cortex','thalamus','thalamus'] ]
 ]
 
 # ------------------

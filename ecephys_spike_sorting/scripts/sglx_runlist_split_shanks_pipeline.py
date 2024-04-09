@@ -77,7 +77,7 @@ npx_directory = r'D:\pipeline_test_data'
 #           these strings must match a key in the param dictionaries above.
 
 run_specs = [									
-						['230424_CA521_ex', '0', '0,0', '0', ['cortex','thalamus','thalamus'] ]
+						['SC048_122920_exch', '0', '0,0', '0', ['cortex','thalamus','thalamus'] ]
 ]
 
 # ------------------
@@ -184,8 +184,8 @@ modules = [
             'ks4_helper',
             'kilosort_postprocessing',
             #'noise_templates',  
-            'mean_waveforms',
-            'quality_metrics'
+            #'mean_waveforms',
+            #'quality_metrics'
 			]
 
 if ks_ver in ['2.0','2.5','3.0'] and 'kilosort_helper' not in modules:

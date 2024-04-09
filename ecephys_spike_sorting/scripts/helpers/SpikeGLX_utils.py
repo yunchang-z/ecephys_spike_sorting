@@ -319,8 +319,41 @@ def CreateNITimeEvents(catGT_run_name, gate_string, catGT_dest):
 
     return
 
+def Chans2PrintStr(chan_bool):
+    # return printer string (runs of sequential channels given by a:b) for 
+    # an array of channel indicies
+    # code adapted from Bill Karsh
+    # create a logical array with maxChan elements
+    chan_ind = np.where(chan_bool)
+    nb = len(chan_bool)
+    min_ind = np.min(chan_ind)
+
+    out_str = repr(min_ind)
+    rn = False
+    
+    # starting from the first channel
+    for ib in range(min_ind+1, nb):
+        if not chan_bool[ib]:
+             # if we were in a run, the last index was the end of it
+            if rn:
+                out_str = out_str + ':' + repr(ib-1)
+                rn = False
+        else:
+            if not chan_bool[ib-1]:
+                # if the last index was not included start a new entry
+                out_str = out_str + ',' + repr(ib)
+            else:
+                # if the last index was included, we have a run
+                rn = True
+    
+    # after looping over all indices, add last entry if in a run
+    if rn:
+        out_str = out_str + ':' + repr(nb-1)            
+    
+    return out_str
+    
 def CreateShankSaveString(metaFullPath):
-    #first create Path object from string
+    # first create Path object from string
     metaPath = Path(metaFullPath)
     metaStem = metaPath.stem
     imec_pos = metaStem.rfind('imec',0)
@@ -338,20 +371,32 @@ def CreateShankSaveString(metaFullPath):
        save_str = ''
        out_ind_list = []
        return nShank, save_str, out_ind_list
-        
-    xCoord, yCoord, shankInd = SGLXMeta.MetaToCoords(metaPath,-1)
+    
+    # check for a sync string in the input
+    meta = SGLXMeta.readMeta(metaPath)
+    AP, LF, SY = SGLXMeta.ChannelCountsIM(meta)
+    orig_chan_ind = SGLXMeta.OriginalChans(meta)    
+    ap_chan_ind = orig_chan_ind[0:AP]
+    sy_ind = orig_chan_ind[len(orig_chan_ind)-SY:len(orig_chan_ind)]
+    print(repr(sy_ind))
+
+    xCoord, yCoord, shankInd = SGLXMeta.MetaToCoords(metaPath,-1)    
     sh, sh_counts = np.unique(shankInd, return_counts=True)
+    
     save_str = ''
     out_ind_list = []
     nShank = len(sh)
     for i in range(nShank):
         # get channels on this shank
-        sh_chan = np.squeeze( np.argwhere(shankInd == sh[i]))  
-        sh_chan_str = np.array2string(sh_chan, separator=',',max_line_width=np.inf)   
-        sh_chan_str = sh_chan_str.replace(' ','')  # remove spaces 
-        sh_chan_str = sh_chan_str[1:len(sh_chan_str)-1]   #trim off square brackets
+        sh_chan_bool = (shankInd == sh[i])
+        all_chan_bool = np.ndarray((np.max(orig_chan_ind)+1,),dtype=bool)
+        all_chan_bool[:] = False
+        all_chan_bool[sy_ind] = True
+        all_chan_bool[ap_chan_ind[sh_chan_bool]] = True
+        sh_chan_str = Chans2PrintStr(all_chan_bool)        
         out_ind_str = str(int(1000 + 10*prb_ind + sh[i]))
         out_ind_list.append(out_ind_str)
         save_str = save_str + ' -save=2,' + repr(prb_ind) + ',' + out_ind_str + ',' + sh_chan_str
         
     return nShank, save_str, out_ind_list
+

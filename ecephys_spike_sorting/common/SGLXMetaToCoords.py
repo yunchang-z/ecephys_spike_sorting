@@ -63,7 +63,45 @@ def ChannelCountsIM(meta):
     SY = int(chanCountList[2])
     
     return(AP, LF, SY)
+    
+# =========================================================
+# Return index of SYNC channel in the acquired data
+#
+def SyncChanIndexIM(meta):
+    chanCountList = meta['acqApLfSy'].split(sep=',')
+    AP = int(chanCountList[0])
+    LF = int(chanCountList[1])
+    SY = int(chanCountList[2])
+    if SY > 0:
+        syInd = AP + LF
+    else:    
+        syInd = -1
+    return(syInd)
 
+# ===========================================================
+# Return indicies of the original channels in the acquisition
+# In the context of the pipeline, used to build save strings 
+# to split out shanks. This list includes the SYNC channel
+#
+def OriginalChans(meta):
+    if meta['snsSaveChanSubset'] == 'all':
+        # output = int32, 0 to nSavedChans - 1
+        chans = np.arange(0, int(meta['nSavedChans']))
+    else:
+        # parse the snsSaveChanSubset string
+        # split at commas
+        chStrList = meta['snsSaveChanSubset'].split(sep=',')
+        chans = np.arange(0, 0)  # creates an empty array of int32
+        for sL in chStrList:
+            currList = sL.split(sep=':')
+            if len(currList) > 1:
+                # each set of contiguous channels specified by
+                # chan1:chan2 inclusive
+                newChans = np.arange(int(currList[0]), int(currList[1])+1)
+            else:
+                newChans = np.arange(int(currList[0]), int(currList[0])+1)
+            chans = np.append(chans, newChans)
+    return(chans)
 
 # =========================================================
 # Return geometry paramters for supported probe types
