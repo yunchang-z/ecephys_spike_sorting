@@ -318,3 +318,40 @@ def CreateNITimeEvents(catGT_run_name, gate_string, catGT_dest):
         file_fyi.close()
 
     return
+
+def CreateShankSaveString(metaFullPath):
+    #first create Path object from string
+    metaPath = Path(metaFullPath)
+    metaStem = metaPath.stem
+    imec_pos = metaStem.rfind('imec',0)
+    ap_pos = metaStem.rfind('.ap',0) 
+    if imec_pos > 0 and ap_pos > 0:
+        # good metadata name
+        imStr = metaStem[imec_pos:ap_pos]
+        if len(imStr) == 4:
+            prb_ind = 0      # 3A data, no probe index
+        else:
+            prb_ind = int(imStr[4:len(imStr)])
+    else:
+       print('Incorrect metadata filenmae.') 
+       nShank = 0
+       save_str = ''
+       out_ind_list = []
+       return nShank, save_str, out_ind_list
+        
+    xCoord, yCoord, shankInd = SGLXMeta.MetaToCoords(metaPath,-1)
+    sh, sh_counts = np.unique(shankInd, return_counts=True)
+    save_str = ''
+    out_ind_list = []
+    nShank = len(sh)
+    for i in range(nShank):
+        # get channels on this shank
+        sh_chan = np.squeeze( np.argwhere(shankInd == sh[i]))  
+        sh_chan_str = np.array2string(sh_chan, separator=',',max_line_width=np.inf)   
+        sh_chan_str = sh_chan_str.replace(' ','')  # remove spaces 
+        sh_chan_str = sh_chan_str[1:len(sh_chan_str)-1]   #trim off square brackets
+        out_ind_str = str(int(1000 + 10*prb_ind + sh[i]))
+        out_ind_list.append(out_ind_str)
+        save_str = save_str + ' -save=2,' + repr(prb_ind) + ',' + out_ind_str + ',' + sh_chan_str
+        
+    return nShank, save_str, out_ind_list

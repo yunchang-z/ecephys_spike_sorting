@@ -25,8 +25,10 @@ def runOne( session_id,
         print(command)
         subprocess.check_call(command.split(' '))  
     
+    # if we are running any modules
     # copy module json file to data directory as record of the input parameters 
-    shutil.copy(module_input_json, os.path.join(data_directory, session_id + '-input.json'))
+    if len(modules) > 0:
+        shutil.copy(module_input_json, os.path.join(data_directory, session_id + '-input.json'))
     
     for module in modules:
         output_json = os.path.join(json_directory, session_id + '-' + module + '-output.json')  

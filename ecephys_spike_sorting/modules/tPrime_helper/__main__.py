@@ -42,6 +42,8 @@ def call_TPrime(args):
     sync_period = args['tPrime_helper_params']['sync_period']
     
     sort_out_tag = args['tPrime_helper_params']['sort_out_tag']
+    output_pat = 'imec*_' + sort_out_tag
+    sort_out_list = list()
     
     # check for presence of an fyi file, indicating run with catgt 3.0 or later
     fyi_path = run_directory.replace('\\', '/') + '/' + run_name + '_all_fyi.txt'
@@ -64,35 +66,43 @@ def call_TPrime(args):
             = parse_catgt_fyi(fyi_path, toStream_id)
         
         if toStream_js == 2:
-            # if toStream is an imec probe, create the file of spike times in sec
+            # if toStream is an imec probe, create the file of spike times in sec for all output files
             prb_dir = prb_dir_prefix + str(toStream_ip)
-            ks_outdir = 'imec' + str(toStream_ip) + '_' + sort_out_tag      
-            st_file = os.path.join(run_directory, prb_dir, ks_outdir, 'spike_times.npy')
-            # convert to seconds; if bNPY = True, returned file is an npy file
-            # otherwise, text.
-            toStream_events_sec = spike_times_npy_to_sec(st_file, 0, bNPY)
-            # create a copy with name = spike_times_sec.adj
-            shutil.copyfile(toStream_events_sec, os.path.join(run_directory, prb_dir, ks_outdir, 'spike_times_sec_adj.npy'))
-            # if data was saved as text, also save as npy
-            if not bNPY:
-                spike_times_sec_to_npy(toStream_events_sec)
+            prb_path = Path(prb_dir)
+            # get list of output directories -- can be multiples when splitting shanks
+            ks_outdir_iter = prb_path.glob(output_pat)
+            for ks_outdir in ks_outdir_iter:   
+                sort_out_list.append(ks_outdir)
+                st_file = os.path.join(run_directory, prb_dir, ks_outdir, 'spike_times.npy')
+                # convert to seconds; if bNPY = True, returned file is an npy file
+                # otherwise, text.
+                toStream_events_sec = spike_times_npy_to_sec(st_file, 0, bNPY)
+                # create a copy with name = spike_times_sec.adj
+                shutil.copyfile(toStream_events_sec, os.path.join(run_directory, prb_dir, ks_outdir, 'spike_times_sec_adj.npy'))
+                # if data was saved as text, also save as npy
+                if not bNPY:
+                    spike_times_sec_to_npy(toStream_events_sec)
                         
         # loop over the from_list_ids; for any that are probes, need to create 
         # files of spike times, and append to event_list, from_stream_index, and out_list
         for i, id in enumerate(from_list_ids):
-            if id[0] == 2:      # imec stream
+            if id[0] == 2:      # imec stream                
                 prb_dir = prb_dir_prefix + str(id[1])
-                ks_outdir = 'imec' + str(id[1]) + '_' + sort_out_tag
-                st_file = os.path.join(run_directory, prb_dir, ks_outdir, 'spike_times.npy')
-                # convert to seconds; if bNPY = True, returned file is an npy file
-                # otherwise, text.
-                st_file_sec = spike_times_npy_to_sec(st_file, 0, bNPY)
-                events_list.append(st_file_sec)
-                from_stream_index.append(i)
-                # build path for output spike times text file
-                out_name = 'spike_times_sec_adj' + outSuffix
-                out_file = os.path.join(run_directory, prb_dir,ks_outdir, out_name)
-                out_list.append(out_file)
+                prb_path = Path(os.path.join(run_directory, prb_dir))                
+                # get list of output directories -- can be multiples when splitting shanks
+                ks_outdir_iter = prb_path.glob(output_pat)
+                for ks_outdir in ks_outdir_iter:
+                    sort_out_list.append(ks_outdir)
+                    st_file = os.path.join(run_directory, prb_dir, ks_outdir, 'spike_times.npy')
+                    # convert to seconds; if bNPY = True, returned file is an npy file
+                    # otherwise, text.
+                    st_file_sec = spike_times_npy_to_sec(st_file, 0, bNPY)
+                    from_stream_index.append(i)
+                    events_list.append(st_file_sec)                
+                    # build path for output spike times text file
+                    out_name = 'spike_times_sec_adj' + outSuffix
+                    out_file = os.path.join(run_directory, prb_dir,ks_outdir, out_name)
+                    out_list.append(out_file)
                          
     else:
         # Must be running with data from older CatGT with no fyi file
@@ -155,9 +165,8 @@ def call_TPrime(args):
     # if the psth extract string is not null
     
     extract_str = args['tPrime_helper_params']['psth_ex_str']
-    if len(extract_str) > 0:
-        prbDir_list = create_prbDir_list(run_directory, prb_dir_prefix)
-        create_PSTH_events( all_list, out_list, prbDir_list, extract_str, \
+    if len(extract_str) > 0:       
+        create_PSTH_events( all_list, out_list, sort_out_list, extract_str, \
                            args['tPrime_helper_params']['sort_out_tag'] )
 
     execution_time = time.time() - start
@@ -373,19 +382,15 @@ def create_PSTH_events( all_list, out_list, prbDir_list, extract_str, sort_name 
                 line = inFile.readline()
 
     # The output should be saved with the phy output, where the event viewer
-    # plugin can read it   
-        for pDir in prbDir_list: 
-            print(pDir)
-            im_pos = pDir.find('_imec')
-            prbStr = pDir[im_pos+5:len(pDir)]
-            phy_name = 'imec' + prbStr + '_' + sort_name
-            phy_dir = os.path.join(pDir, phy_name)
-            event_path = os.path.join(phy_dir, 'events.csv')
+    # plugin can read it.   
+        for pDir in prbDir_list:
+            event_path = os.path.join(pDir, 'events.csv')
             nEvent = len(edgeTimes)
             with open(event_path, 'w') as outfile:
-                for i in range(0, nEvent-1):
-                    outfile.write(f'{edgeTimes[i]:.6f},')
-                outfile.write(f'{edgeTimes[nEvent-1]:.6f}')
+                if nEvent > 0:
+                    for i in range(0, nEvent-1):
+                        outfile.write(f'{edgeTimes[i]:.6f},')
+                    outfile.write(f'{edgeTimes[nEvent-1]:.6f}')
 
     return
         
