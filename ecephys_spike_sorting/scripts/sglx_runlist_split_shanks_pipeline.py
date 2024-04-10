@@ -184,17 +184,9 @@ modules = [
             'ks4_helper',
             'kilosort_postprocessing',
             #'noise_templates',  
-            #'mean_waveforms',
-            #'quality_metrics'
+            'mean_waveforms',
+            'quality_metrics'
 			]
-
-if ks_ver in ['2.0','2.5','3.0'] and 'kilosort_helper' not in modules:
-    print('For MATLAB versions of KS, run kilosort_helper module')
-    sys.exit()
-if ks_ver == '4' and 'ks4_helper' not in modules:
-    print('For kilsort 4, run ks4_helper module')
-    sys.exit()
-    
 
 
 json_directory = r'C:\Users\labadmin\Documents\ecephys_anaconda\ecephys_json'
@@ -204,6 +196,13 @@ json_directory = r'C:\Users\labadmin\Documents\ecephys_anaconda\ecephys_json'
 # End of user input
 # -----------------------
 # -----------------------
+
+if ks_ver in ['2.0','2.5','3.0'] and 'kilosort_helper' not in modules:
+    print('For MATLAB versions of KS, run kilosort_helper module')
+    sys.exit()
+if ks_ver == '4' and 'ks4_helper' not in modules:
+    print('For kilsort 4, run ks4_helper module')
+    sys.exit()
 
 # delete the existing CatGT.log
 try:

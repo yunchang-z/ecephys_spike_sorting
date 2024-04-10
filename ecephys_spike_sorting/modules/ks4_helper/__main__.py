@@ -86,7 +86,7 @@ def _fix_phy_params(output_dir, dat_path, dat_name, chan_phy_binary,
 
 def run_ks4(args):
 
-    print('ecephys spike sorting: pyks2 helper module')
+    print('ecephys spike sorting: ks4 helper module')
     
     
     """Run full spike sorting pipeline on specified data.
