@@ -154,7 +154,7 @@ pip install setuptools==59.8.0
 Install Kilosort 4 and pytorch:
 
 ```shell
-conda create --name kilosort python=3.9
+conda create --name ks4_ece python=3.9
 pip uninstall torch
 conda install pytorch pytorch-cuda=11.8 -c pytorch -c nvidia
 ```
