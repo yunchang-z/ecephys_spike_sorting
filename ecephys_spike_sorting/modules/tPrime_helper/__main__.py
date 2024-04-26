@@ -68,10 +68,10 @@ def call_TPrime(args):
         if toStream_js == 2:
             # if toStream is an imec probe, create the file of spike times in sec for all output files
             prb_dir = prb_dir_prefix + str(toStream_ip)
-            prb_path = Path(prb_dir)
+            prb_path =  Path(os.path.join(run_directory, prb_dir)) 
             # get list of output directories -- can be multiples when splitting shanks
             ks_outdir_iter = prb_path.glob(output_pat)
-            for ks_outdir in ks_outdir_iter:   
+            for ks_outdir in ks_outdir_iter: 
                 sort_out_list.append(ks_outdir)
                 st_file = os.path.join(run_directory, prb_dir, ks_outdir, 'spike_times.npy')
                 # convert to seconds; if bNPY = True, returned file is an npy file

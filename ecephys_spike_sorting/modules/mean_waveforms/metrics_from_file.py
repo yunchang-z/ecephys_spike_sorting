@@ -77,6 +77,7 @@ def metrics_from_file(mean_waveform_fullpath,
     upsampling_factor = params['upsampling_factor']
     spread_threshold = params['spread_threshold']
     site_range = params['site_range']
+    nAP = params['nAP']
 
     # #############################################
 
@@ -95,9 +96,9 @@ def metrics_from_file(mean_waveform_fullpath,
     # For any unit that has spikes and a calculable mean waveform, update the
     # estimated peak channel with the measured one.
     
-    if mean_waveforms.shape[1] == 385:
+    if mean_waveforms.shape[1] > nAP:
         # remove digital channel
-        mean_waveforms = mean_waveforms[:,0:384,:]
+        mean_waveforms = mean_waveforms[:,0:nAP,:]
     vpp_allchan = np.amax(mean_waveforms,2) - np.amin(mean_waveforms,2)
     vpp_val = np.amax(vpp_allchan,1)
     meas_pkchan = np.argmax(vpp_allchan,1)  

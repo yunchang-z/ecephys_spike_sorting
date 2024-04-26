@@ -77,10 +77,10 @@ def _fix_phy_params(output_dir, dat_path, dat_name, chan_phy_binary,
             fout.write(line)
             
     # also, resave spike_times.npy as uint64
-    st = np.load(os.path.join(output_dir,'spike_times.npy'))
-    st_neg = np.squeeze(np.where(st<0))
-    st[st_neg] = 0
-    np.save(os.path.join(output_dir,'spike_times.npy'), st.astype(np.uint64))
+    # st = np.load(os.path.join(output_dir,'spike_times.npy'))
+    #st_neg = np.squeeze(np.where(st<0))
+    #st[st_neg] = 0
+    #np.save(os.path.join(output_dir,'spike_times.npy'), st.astype(np.uint64))
     
 
 

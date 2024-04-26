@@ -7,6 +7,7 @@ class MeanWaveformParams(DefaultSchema):
     samples_per_spike = Int(required=True, default=82, help='Number of samples to extract for each spike')
     pre_samples = Int(required=True, default=20, help='Number of samples between start of spike and the peak')
     num_epochs = Int(required=True, default=1, help='Number of epochs to compute mean waveforms')
+    nAP = Int(required=True, default=384, help='Number AP channels in saved file')
     spikes_per_epoch = Int(require=True, default=100, help='Max number of spikes per epoch')
     upsampling_factor = Float(require=False, default=200/82, help='Upsampling factor for calculating waveform metrics')
     spread_threshold = Float(require=False, default=0.12, help='Threshold for computing channel spread of 2D waveform')
@@ -16,7 +17,7 @@ class MeanWaveformParams(DefaultSchema):
     snr_radius = Int(require=False, default=8, help='disk radius (chans) about pk-chan for snr calculation in C_waves')
     snr_radius_um = Int(require=False, default=8, help='disk radius (um) about pk-chan for snr calculation in C_waves')
     mean_waveforms_file = String(required=True, help='Path to mean waveforms file (.npy)')
-
+    
 
 class InputParameters(ArgSchema):
     
