@@ -144,19 +144,21 @@ These instructions are to build an environment compatible with KS4 and MATLAB ve
 
 If not already present, install Miniconda with python 3.9 (https://docs.conda.io/en/latest/miniconda.html).
 
+Install Kilosort 4 and pytorch (you can pick your name for the environment:
+
+```shell
+conda create --name ks4_ece python=3.9
+conda activate ks4_ece
+python -m pip install kilosort[gui]
+pip uninstall torch
+conda install pytorch pytorch-cuda=11.8 -c pytorch -c nvidia
+```
+
 As with pipenv, to be compatible with versions of MATLAB < R2021, install an earlier version of setuptools:
 
 ```shell
 pip uninstall setuptools
 pip install setuptools==59.8.0
-```
-
-Install Kilosort 4 and pytorch:
-
-```shell
-conda create --name ks4_ece python=3.9
-pip uninstall torch
-conda install pytorch pytorch-cuda=11.8 -c pytorch -c nvidia
 ```
 
 It's a good idea at this point to run a small test dataset through the kilosort gui. There are tips for debugging issues with the pytorch installation in the KS4 readme.

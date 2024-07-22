@@ -41,9 +41,9 @@ def run_postprocessing(args):
                         use_master_clock = False, \
                         include_pcs = include_pcs )
         # empty arrays to stand in for the missing variables
-        pc_features = []
-        pc_feature_ind = []
-        template_features = []
+        pc_features = np.asarray([])
+        pc_feature_ind = np.asarray([])
+        template_features = np.asarray([])
         
     if args['ks_postprocessing_params']['align_avg_waveform']: 
         spike_times = align_spike_times(spike_times,
@@ -76,12 +76,13 @@ def run_postprocessing(args):
     output_dir = args['directories']['kilosort_output_directory']
     np.save(os.path.join(output_dir, 'spike_times.npy'), spike_times)
     np.save(os.path.join(output_dir, 'amplitudes.npy'), amplitudes)
-    np.save(os.path.join(output_dir, 'spike_clusters.npy'), spike_clusters)
+    np.save(os.path.join(output_dir, 'spike_clusters.npy'), spike_clusters)    
     np.save(os.path.join(output_dir, 'spike_templates.npy'), spike_templates)
     
     if args['ks_postprocessing_params']['include_pcs']:
         np.save(os.path.join(output_dir, 'pc_features.npy'), pc_features)
-        np.save(os.path.join(output_dir, 'template_features.npy'), template_features)
+        if template_features.size > 0: 
+            np.save(os.path.join(output_dir, 'template_features.npy'), template_features)
     
     if args['ks_postprocessing_params']['remove_duplicates']:
         np.save(os.path.join(output_dir, 'overlap_matrix.npy'), overlap_matrix)

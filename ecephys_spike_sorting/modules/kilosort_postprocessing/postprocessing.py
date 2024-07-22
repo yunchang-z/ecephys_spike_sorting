@@ -58,7 +58,7 @@ def remove_double_counted_spikes(spike_times, spike_clusters, spike_templates,
     pc_features : numpy.ndarray (num_spikes x num_pcs x num_channels)
         Pre-computed PCs for blocks of channels around each spike
     template_features : numpy.ndarray (num_spikes x number of template features)
-        projections of each spike onto the template features
+        projections of each spike onto the template features; if file is not found, skips
     overlap_matrix : numpy.ndarray (num_clusters x num_clusters)
         Matrix indicating number of spikes removed for each pair of clusters
 
@@ -344,7 +344,8 @@ def remove_spikes(spike_times, spike_clusters, spike_templates, amplitudes, pc_f
     
     if include_pcs:
         pc_features = np.delete(pc_features, spikes_to_remove, 0)
-        template_features = np.delete(template_features, spikes_to_remove, 0)
+        if template_features.size > 0:
+            template_features = np.delete(template_features, spikes_to_remove, 0)
     # otherwise, just returns the input pc_fearures and template_features arrays
 
     return spike_times, spike_clusters, spike_templates, amplitudes, pc_features, template_features

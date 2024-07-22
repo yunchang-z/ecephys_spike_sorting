@@ -25,7 +25,7 @@ class KS4HelperParameters(DefaultSchema):
     ccg_threshold = Float(required=False, default=0.25, help='Fraction of refractory period violations that are allowed in the CCG compared to baseline; used to perform splits and merges. ')
     acg_threshold = Float(required=False, default=0.20, help='Fraction of refractory period violations that are allowed in the ACG compared to baseline; used to assign "good" units. ')
     ks_make_copy = Bool(required=False, default=False, help='If true, make a copy of the original KS output')
-    
+    save_extra_vars = Bool(required=False, default=False, help='If true, save Wall and pc features in save_to_phy ')
     doFilter = Int(required=False, default=0, help='filter if = 1, skip bp filtering if = 0')
     templateSeed = Int(required=False, default=0, help='filter if = 1, seed to pick which batches are used for finding universal templates')
 

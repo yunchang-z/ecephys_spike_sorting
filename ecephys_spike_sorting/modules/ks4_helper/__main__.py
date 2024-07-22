@@ -188,7 +188,7 @@ def run_ks4(args):
                  results_dir=ks_output_dir,
                  data_dtype='int16', 
                  do_CAR=settings.get('car'), 
-                 save_extra_vars=False)
+                 save_extra_vars=settings.get('save_extra_vars'))
 #
     # make sure the params file for phy has the correct number of channels
     # to match the input binary. This is likely not necessary for KS4.

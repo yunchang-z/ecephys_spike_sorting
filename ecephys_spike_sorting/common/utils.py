@@ -315,7 +315,10 @@ def load_kilosort_data(folder,
     if include_pcs:
         pc_features = load(folder, 'pc_features.npy')
         pc_feature_ind = load(folder, 'pc_feature_ind.npy')
-        template_features = load(folder, 'template_features.npy') 
+        if os.path.isfile(os.path.join(folder, 'template_features.npy')):
+            template_features = load(folder, 'template_features.npy') 
+        else:
+            template_features = np.asarray([])
 
                 
     templates = templates[:,template_zero_padding:,:] # remove zeros

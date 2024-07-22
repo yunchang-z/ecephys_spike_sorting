@@ -19,7 +19,7 @@ from create_input_json import createInputJson
 # -------------------------------
 # Full path to log file
 # If this file exists, new run data is appended to it
-logFullPath = r'D:\pipeline_test_data\filelist_test\pipeline_log.csv'
+logFullPath = r'F:\pipeline_log.csv'
 
 # ks_ver  sets up the output tag and threshold values.
 # To run a specific MATLAB KS, make sure to set up the kilosort_repository in 
@@ -64,8 +64,8 @@ else:
 # for each recording, specfiy a full path the the binary and a brain region
 
 recording_specs = [									
-				[r'D:\pipeline_test_data\filelist_test\catgt_031924_INS2_4_DT3_test_g0\031924_INS2_4_DT3_test_g0_tcat.imec1000.ap.bin', ['default'] ],
-                [r'D:\pipeline_test_data\filelist_test\SC048_122920_ex_g0\SC048_122920_ex_g0_tcat.imec0.ap.bin', ['medulla'] ]
+				[r'F:\SC026_OUT\catgt_SC026_080619_g0\SC026_080619_g0_imec2\SC026_080619_g0_tcat.imec2.ap.bin', ['thalamus'] ]
+                #[r'D:\pipeline_test_data\filelist_test\SC048_122920_ex_g0\SC048_122920_ex_g0_tcat.imec0.ap.bin', ['medulla'] ]
 
 ]
 

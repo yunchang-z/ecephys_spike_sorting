@@ -1,3 +1,4 @@
+
 import os, io, json, sys
 
 if sys.platform == 'linux':
@@ -82,24 +83,24 @@ def createInputJson(output_file,
     # These ONLY need to be defined if you are going to call them.
     if ks_ver == '2.0':
         kilosort_repository = r'C:\Users\labadmin\Documents\KS20_for_preprocessed_data'
-    elif ks_ver == '2.5':      # must equal '3.0', '2.5' or '2.0'
-        kilosort_repository = r'C:\Users\labadmin\Documents\KS20_for_preprocessed_data'
+    elif ks_ver == '2.5':      
+        kilosort_repository = r'C:\Users\labadmin\Documents\Kilosort-2.5.2'
     elif ks_ver == '3.0':
         kilosort_repository = r'C:\Users\labadmin\Documents\KS20_for_preprocessed_data'
     else:
         kilosort_repository = r''  # default path for when we aren't using any of these
             
     npy_matlab_repository = r'C:\Users\labadmin\Documents\npy-matlab-master'
-    catGTPath = r'C:\Users\labadmin\Documents\CatGT-win'
+    catGTPath = r'C:\Users\labadmin\Documents\CatGT-win-44'
     tPrime_path=r'C:\Users\labadmin\Documents\TPrime-win'
-    cWaves_path=r'C:\Users\labadmin\Documents\C_Waves-win'
+    cWaves_path=r'C:\Users\labadmin\Documents\C_Waves_Latest\C_Waves-win'
          
     # for config files and kilosort working space
     kilosort_output_tmp = r'D:\kilosort_datatemp' 
     
     
     # KS 3.0 and 4 do not calculation pc features for phy
-    if ks_ver in  ['3.0', '4']:
+    if ks_ver in  ['3.0']:
         include_pcs = False  # set to false for ks_ver = '3.0'
     
     # derived directory names
@@ -134,7 +135,7 @@ def createInputJson(output_file,
         # 
         if input_meta_path is not None:
             probe_type, sample_rate, num_channels, reference_channels, \
-            uVPerBit, vpitch, hpitch, nColumn, useGeom \
+            uVPerBit, vpitch, hpitch, nColumn, nAP, nSY, useGeom\
             = SpikeGLX_utils.EphysParams(input_meta_path) 
             
             print('SpikeGLX params read from meta')
@@ -150,16 +151,7 @@ def createInputJson(output_file,
     else:
        print('Only SpikeGLX data is supported at this time.')
        sys.exit()
-        
-
-            
-
-    # geometry params by probe type. expand the dictionaries to add types
-    # vertical probe pitch vs probe type
-#    vpitch = {'3A': 20, 'NP1': 20, 'NP21': 15, 'NP24': 15, 'NP1100': 6,'NP1110' : 6,'NP1300':20}  
-#    hpitch = {'3A': 32, 'NP1': 32, 'NP21': 32, 'NP24': 32, 'NP1100': 6,'NP1110' : 6,'NP1300':48} 
-#    nColumn = {'3A': 2, 'NP1': 2, 'NP21': 2, 'NP24': 2, 'NP1100': 8,'NP1110': 8,'NP1300':2} 
-    
+         
     
     # CatGT needs the inner and outer redii for local common average referencing
     # specified in sites
@@ -358,6 +350,7 @@ def createInputJson(output_file,
             'ccg_threshold' : 0.25,
             'acg_threshold' : 0.20,
             'ks_make_copy': ks_make_copy,
+            'save_extra_vars' : include_pcs,    # to save Wall and pc features
             'doFilter' : ks_doFilter,       # not yet used
             'templateSeed' : ks_LTseed      # not yet used
     },
@@ -385,7 +378,8 @@ def createInputJson(output_file,
             "cWaves_path" : cWaves_path,
             "use_C_Waves" : True,
             "snr_radius" : c_waves_radius_sites,
-            "snr_radius_um" : c_Waves_snr_um
+            "snr_radius_um" : c_Waves_snr_um,
+            "nAP" : nAP
         },
             
 
