@@ -85,7 +85,7 @@ def calculate_metrics(spike_times, spike_clusters, spike_templates, amplitudes, 
 
     for epoch in epochs:
 
-        in_epoch = (spike_times > epoch.start_time) * (spike_times < epoch.end_time)
+        in_epoch = (spike_times >= epoch.start_time) * (spike_times <= epoch.end_time)
 
         print("Calculating isi violations")
         isi_viol, num_viol = calculate_isi_violations(spike_times[in_epoch], spike_clusters[in_epoch], total_units, params['isi_threshold'], params['min_isi'])
