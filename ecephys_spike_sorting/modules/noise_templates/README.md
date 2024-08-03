@@ -6,7 +6,7 @@ Identifies "noise" units based on template shape
 
 This module contains code for two different approaches to noise template identification:
 
-(1) `id_noise_templates()` uses a variety of heuristics to find units with abnormal spatial spread (single channel or >25 channels), abnormal shape (no peak and trough), or multiple spatial peaks. These are based on many observations of typical noise template shapes from Neuropixels recordings in cortex, hippocampus, thalamus, and midbrain. The appropriate heuristics will likely need to be updated for different types of electrodes or different brain regions.
+(1) `id_noise_templates()` uses a variety of heuristics to find units with abnormal spatial spread (single channel or > 300 um), or multiple spatial peaks. These are based on many observations of typical noise template shapes from Neuropixels recordings in cortex, hippocampus, thalamus, and midbrain. The appropriate heuristics will likely need to be updated for different types of electrodes or different brain regions. To tune the parameters, you can adjust values in the schemas.py file and run just this module on your output (e.g. in sglx_multi_run_pipeline, set run_CatGT=False, and comment out all modules except noise_templates.
 
 (2)  `id_noise_templates_rf()` uses a [random forest classifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) trained on manually annotated templates. A pickle file containing the classifier object is included in this repository. A PyQt-based app (`template_classifier_app.py`) is available if you'd like train your own classifier.
 

@@ -12,11 +12,16 @@ class NoiseWaveformParams(DefaultSchema):
     min_spread_threshold = Int(default=2, help='Minimum number of channels for a waveform to be considered good')
     mid_spread_threshold = Int(default=16, help='Over this channel spread, waveform shape must be considered')
     max_spread_threshold = Int(default=25, help='Maximum channel spread for a good unit')
+    smoothed_template_filter_width_um = Int(default=15, help='Smoothing window for calculating spread')
+    min_spread_threshold_um = Int(default=10, help='Minimum spatial spread of a waveform to be considered good')
+    mid_spread_threshold_um = Int(default=50, help='Over this channel spread, waveform shape must be considered')
+    max_spread_threshold_um = Int(default=300, help='Maximum channel spread for a good unit')
 
-    channel_amplitude_thresh = Float(default=0.25, help='Fraction of max amplitude for considering channels in spatial peak detection')
+    channel_amplitude_thresh = Float(default=0.3, help='Fraction of max amplitude for considering channels in spatial peak detection')
     peak_height_thresh = Float(default=0.2, help='Minimum height for spatial peak detection')
     peak_prominence_thresh = Float(default=0.2, help='Minimum prominence for spatial peak detection')
     peak_channel_range = Int(default=24, help='Range of channels for detecting spatial peaks')
+    peak_channel_range_um = Int(default=150, help='Range of in um to check for spatial peaks') 
     peak_locs_std_thresh = Float(default=3.5, help='Maximum standard deviation of peak locations for good units')
 
     min_temporal_peak_location = Int(default=10, help='Minimum peak index for good unit')

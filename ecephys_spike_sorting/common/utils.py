@@ -320,8 +320,21 @@ def load_kilosort_data(folder,
         else:
             template_features = np.asarray([])
 
-                
-    templates = templates[:,template_zero_padding:,:] # remove zeros
+    # fix any nans in templates
+    if np.sum(np.isnan(templates)):
+        templates = np.nan_to_num(templates)
+        np.save(os.path.join(folder,'templates.npy'),templates)
+    
+     # zero padding differs between sort versions, so derive from the
+    # values in the templates
+    s1 = np.nansum(templates,axis=0)
+    s2 = np.nansum(s1,axis=1)
+    wz = np.where(s2==0)
+    if np.any(wz[0]):       
+        template_zero_padding = np.max(wz) + 1
+        print('template zero padding: ' + repr(template_zero_padding))
+        templates = templates[:,template_zero_padding:,:] # remove zeros
+        
     spike_clusters = np.squeeze(spike_clusters) # fix dimensions
     spike_times = np.squeeze(spike_times)# fix dimensions
 
@@ -343,7 +356,7 @@ def load_kilosort_data(folder,
         
     cluster_amplitude = read_cluster_amplitude_tsv(os.path.join(folder, 'cluster_Amplitude.tsv'))
     
-    # check that cluster cluster_amplitude has the same number of entries as templates
+    # check that cluster_amplitude has the same number of entries as templates
     # if highest index units have no spikes, they will not have an entry in cluster_Amplitudes.tsv
     diff = templates.shape[0] - cluster_amplitude.size
     if diff > 0:

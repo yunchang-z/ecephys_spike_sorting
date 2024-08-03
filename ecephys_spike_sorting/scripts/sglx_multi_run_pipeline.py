@@ -24,7 +24,7 @@ from create_input_json import createInputJson
 # create_input_json; in the module list, call 'kilosort helper'
 # To run KS4, use an anaconda install and call 'ks4_helper'
 
-ks_ver = '4'  # needs to be one of: '2.0', '2.5', '3.0', or '4'
+ks_ver = '2.5'  # needs to be one of: '2.0', '2.5', '3.0', or '4'
 ksTag_dict = {'2.0':'ks2', '2.5':'ks25', '3.0':'ks3', '4':'ks4'}
 ks_output_tag = ksTag_dict[ks_ver]
 
@@ -112,7 +112,7 @@ process_lf = False
 # these parameters will be used for all runs
 catGT_cmd_string = '-prb_fld -out_prb_fld -apfilter=butter,12,300,10000 -lffilter=butter,12,1,500 -gfix=0.4,0.10,0.02 '
 
-ni_present = True
+ni_present = False
 ni_extract_string = '-xa=0,0,0,1,3,500 -xia=0,0,1,3,3,0 -xd=0,0,-1,1,50 -xid=0,0,-1,2,1.7 -xid=0,0,-1,3,5'
 
 
@@ -179,7 +179,7 @@ toStream_sync_params = 'imec0' # should be ni, imec<probe index>. or obx<obx ind
 # List of modules to run per probe; CatGT and TPrime are called once for each run,
 # and should not be included here.
 modules = [            
-            'ks4_helper',
+            'kilosort_helper',
             'kilosort_postprocessing',
             #'noise_templates',  
             'mean_waveforms',
@@ -375,6 +375,7 @@ for spec in run_specs:
                                        ks_labelGood = 1,
                                        ks_saveRez = ks_saveRez,
                                        ks_copy_fproc = ks_copy_fproc,
+                                       ks_helper_noise_threshold = 20,
                                        ks_minfr_goodchannels = ks_minfr_goodchannels,                  
                                        ks_whiteningRadius_um = ks_whiteningRadius_um,
                                        ks_doFilter = ks_doFilter,

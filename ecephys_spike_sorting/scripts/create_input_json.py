@@ -384,9 +384,9 @@ def createInputJson(output_file,
             
 
         "noise_waveform_params" : {
-            "classifier_path" : os.path.join(modules_directory, 'noise_templates', 'rf_classifier.pkl'),
-            "multiprocessing_worker_count" : 10,
-            "use_random_forest" : noise_template_use_rf
+            "classifier_path" : os.path.join(modules_directory, 'noise_templates', 'rf_classifier.pkl'),            
+            "use_random_forest" : noise_template_use_rf,
+            "peak_channel_range_um" : 150
         },
 
         "quality_metrics_params" : {

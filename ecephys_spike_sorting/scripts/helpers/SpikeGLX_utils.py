@@ -87,7 +87,7 @@ def EphysParams(metaFullPath):
     # read shank map to get disabled (reference) channels
     ref_channels = GetDisabledChan(meta, useGeom)
     
-    xCoord, yCoord, shankInd = SGLXMeta.MetaToCoords(metaPath,-1)
+    xCoord, yCoord, shankInd, connected = SGLXMeta.MetaToCoords(metaPath,-1)
     sh, sh_counts = np.unique(shankInd, return_counts=True)
     # get vpitch, hpitch, nColumn from shank with the largest numbers of sites
     sh_mode = sh[np.argmax(sh_counts)]
@@ -395,7 +395,7 @@ def CreateShankSaveString(metaFullPath):
     sy_ind = orig_chan_ind[len(orig_chan_ind)-SY:len(orig_chan_ind)]
     print(repr(sy_ind))
 
-    xCoord, yCoord, shankInd = SGLXMeta.MetaToCoords(metaPath,-1)    
+    xCoord, yCoord, shankInd, connected = SGLXMeta.MetaToCoords(metaPath,-1)    
     sh, sh_counts = np.unique(shankInd, return_counts=True)
     
     save_str = ''
@@ -444,7 +444,7 @@ def CreateSepShanksString(metaFullPath):
     geomMap = meta['snsGeomMap'].split(sep=')')
     currList = geomMap[0].split(',')
     nShank = int(currList[1]);
-    xCoord, yCoord, shankInd = SGLXMeta.MetaToCoords(metaPath,-1)    
+    xCoord, yCoord, shankInd, connected = SGLXMeta.MetaToCoords(metaPath,-1)    
     sh, sh_counts = np.unique(shankInd, return_counts=True)
      
     sepShanks_str = '-sepShanks=' + repr(prb_ind)

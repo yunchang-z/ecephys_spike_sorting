@@ -52,7 +52,9 @@ def run_kilosort(args):
        destFullPath = os.path.join(args['kilosort_helper_params']['matlab_home_directory'], 'chanMap.mat')
        MaskChannels = np.where(mask == False)[0]  
        print('Indentfied noise channels: ' + repr(MaskChannels))
-       MetaToCoords( metaFullPath=metaFullPath, outType=1, badChan=MaskChannels, destFullPath=destFullPath)
+       connected = MetaToCoords( metaFullPath=metaFullPath, outType=1, badChan=MaskChannels, destFullPath=destFullPath)[3]
+       # create channel map to reference the raw data for KS2.5 and KS3
+       chan_map_raw = np.where(connected==1)[0] 
        # end of SpikeGLX block
        
     else:
@@ -156,11 +158,21 @@ def run_kilosort(args):
         cm = np.load(cm_path)
         chan_phy_binary = cm.size
         fix_phy_params(output_dir, dat_dir, fp_save_name, chan_phy_binary, args['ephys_params']['sample_rate'])
+        # if version = 2.5 or 3.0, save the channel_map for raw data, but don't point to it
+        if args['kilosort_helper_params']['kilosort2_params']['KSver'] in ['2.5', '3.0']:
+            np.save(os.path.join(output_dir,'channel_map_raw.npy'), chan_map_raw)
     else:
         chan_phy_binary = args['ephys_params']['num_channels']
-        fix_phy_params(output_dir, dat_dir, dat_name, chan_phy_binary, args['ephys_params']['sample_rate'])                
+        fix_phy_params(output_dir, dat_dir, dat_name, chan_phy_binary, args['ephys_params']['sample_rate'])
+        # if version = 2.5 or 3.0, make a copy of the existing channel_map.npy file, and write one for 
+        # raw or filtered binary
+        if args['kilosort_helper_params']['kilosort2_params']['KSver'] in ['2.5', '3.0']:
+            cm_path = os.path.join(output_dir, 'channel_map.npy')
+            cm = np.load(cm_path)
+            np.save(os.path.join(output_dir,'channel_map_ks_preprocessed.npy'),cm)
+            np.save(os.path.join(output_dir,'channel_map.npy'), chan_map_raw)      
 
-    # make a copy of the channel map to the data directory
+    # make a copy of the kilosort channel map .mat to the data directory
     # named according to the binary and meta file
     # alredy have path to chanMap = destFullPath
     cm_save_name = metaName + '_chanMap.mat'
@@ -265,6 +277,9 @@ def fix_phy_params(output_dir, dat_path, dat_name, chan_phy_binary, sample_rate)
     with open(os.path.join(output_dir,'params.py'), 'w') as fout:
         for line in paramLines:
             fout.write(line)
+            
+
+    
 
 def main():
 
