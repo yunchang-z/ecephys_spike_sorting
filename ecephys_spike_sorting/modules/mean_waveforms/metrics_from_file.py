@@ -104,20 +104,7 @@ def metrics_from_file(mean_waveform_fullpath,
     meas_pkchan = np.argmax(vpp_allchan,1)  
     vpp_nonzero = (vpp_val > 0)  
     peak_channels[vpp_nonzero] = meas_pkchan[vpp_nonzero]
-#    channel_map = np.squeeze(channel_map)
-#    
-#    nTemplate = templates.shape[0]
-#    
-#    # initialize peak_channels array
-#    peak_channels = np.zeros([nTemplate,],'uint32')
-#    # for each template (nt x nchan), multiply the the transpose (nchan x nt) by inverse of 
-#    # the whitening matrix (nchan x nchan); get max and min along tthe time axis (1)
-#    # to find the peak channel
-#    for i in np.arange(0,nTemplate):
-#        currT = templates[i,:].T
-#        curr_unwh = np.matmul(w_inv, currT)
-#        currdiff = np.max(curr_unwh,1) - np.min(curr_unwh,1)
-#        peak_channels[i] = channel_map[np.argmax(currdiff)]
+
     
     for cluster_idx, cluster_id in enumerate(cluster_ids):
 

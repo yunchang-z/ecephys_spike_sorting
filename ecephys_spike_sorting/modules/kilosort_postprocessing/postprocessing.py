@@ -259,15 +259,6 @@ def find_between_unit_overlap(spike_train1, spike_train2, amp1, amp2, overlap_wi
             min_rem = np.amax([peak_val-rem_range,1])
             max_rem = np.amin([peak_val+rem_range,max_val])
             spikes_to_remove = (cent_dig >= min_rem) & (cent_dig <= max_rem)
-            # if (peak_val > 1) and (peak_val < max_val-1):
-            #     spikes_to_remove = (cent_dig == peak_val) | (cent_dig == peak_val-1) | (cent_dig == peak_val+1)
-            # elif (peak_val == 1):
-            #     spikes_to_remove = (cent_dig == peak_val) | (cent_dig == peak_val+1)
-            # elif (peak_val == max_val-1):
-            #     spikes_to_remove = (cent_dig == peak_val) | (cent_dig == peak_val-1) 
-            # else:
-            #     print('problem with center histogram')
-            #     spikes_to_remove = np.full(spike_diffs.shape,False)
         else:
             spikes_to_remove = np.full(spike_diffs.shape,False)
 
@@ -286,10 +277,8 @@ def find_between_unit_overlap(spike_train1, spike_train2, amp1, amp2, overlap_wi
         lateInd = original_inds[order][1:]
         earlyInd = original_inds[order][0:(len(original_inds)-1)]
         if ( amp1 <= amp2 ):
-#       Remove spikes the cluster with lower amplitude; many duplicate cases are 
+#       Remove spikes from the cluster with lower amplitude; many duplicate cases are 
 #       fitting a tail on a large amplitude feature with a low amplitude spike
-#        if (len(spike_train1) < len(spike_train2)):
-#           Remove spikes from cluster with fewer spikes
 #           Still have the first member of sorted_cluster_ids; to get cases where label 0 is 2nd, add 1
             late0 = lateInd[spikes_to_remove * (sorted_cluster_ids == 0)]
             early0 = earlyInd[spikes_to_remove * (sorted_cluster_ids == 1)]

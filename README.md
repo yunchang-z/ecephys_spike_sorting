@@ -106,6 +106,7 @@ Build the environment -- it will use the Pipfile located in this directory, and 
     $ pipenv shell
     (.venv) $ pip uninstall setuptools
     (.venv) $ pip install setuptools==59.8.0
+    (.venv) $ pip install phylib
     (.venv) $ pip install .
 ```
 ### Set up to run MATLAB from Python
@@ -172,6 +173,7 @@ pip install argschema==1.17.5
 pip uninstall marshmallow
 pip install marshmallow==2.19.2
 pip install h5py
+pip install phylib
 ```
 To run the MATLAB versions of Kilosort in this environment, follow the instruction below in [Set up to run MATLAB from Python in Anconda](#Set-up-to-run-MATLAB-from-Python-in-Anaconda)
 
