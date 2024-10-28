@@ -69,31 +69,31 @@ def createInputJson(output_file,
                     wm_spread_thresh = 0.12,
                     wm_site_range = 16,
                     qm_isi_thresh = 1.5/1000,
-                    include_pcs = True,
+                    include_pcs = False,
                     ks_nNeighbors_sites_fix = 0,
-                    ks4_duplicate_spike_bins = 15,
+                    ks4_duplicate_spike_ms = 0.25,
                     ks4_min_template_size_um = 10
                     ):
 
     # hard coded paths to code on your computer and system
-    ecephys_directory = r'C:\Users\labadmin\Documents\ecephys_anaconda\ecephys_spike_sorting\ecephys_spike_sorting'
+    ecephys_directory = r'C:\Users\colonellj\Documents\ecephys_spike_sorting\ecephys_spike_sorting'
     
     # location of kilosort respositories for MATLAB versions.
     # determins what will be run by the kilosort_helper module
     # These ONLY need to be defined if you are going to call them.
     if ks_ver == '2.0':
-        kilosort_repository = r'C:\Users\labadmin\Documents\KS20_for_preprocessed_data'
+        kilosort_repository = r'C:\Users\colonellj\Documents\KS20_for_preprocessed_data'
     elif ks_ver == '2.5':      
-        kilosort_repository = r'C:\Users\labadmin\Documents\Kilosort-2.5.2'
+        kilosort_repository = r'C:\Users\colonellj\Documents\KS2.5.2_seed'
     elif ks_ver == '3.0':
         kilosort_repository = r'C:\Users\labadmin\Documents\KS20_for_preprocessed_data'
     else:
         kilosort_repository = r''  # default path for when we aren't using any of these
             
-    npy_matlab_repository = r'C:\Users\labadmin\Documents\npy-matlab-master'
-    catGTPath = r'C:\Users\labadmin\Documents\CatGT-win-44'
-    tPrime_path=r'C:\Users\labadmin\Documents\TPrime-win'
-    cWaves_path=r'C:\Users\labadmin\Documents\C_Waves_Latest\C_Waves-win'
+    npy_matlab_repository = r'C:\Users\colonellj\Documents\npy-matlab-master'
+    catGTPath = r'C:\Users\colonellj\Documents\CatGT-win-44'
+    tPrime_path=r'C:\Users\colonellj\Documents\TPrime-win'
+    cWaves_path=r'C:\Users\colonellj\Documents\C_Waves-median\C_Waves-win'
          
     # for config files and kilosort working space
     kilosort_output_tmp = r'D:\kilosort_datatemp' 
@@ -332,27 +332,30 @@ def createInputJson(output_file,
 
         },
                 
-        "ks4_helper_params" : {
+        'ks4_helper_params' : {
             'do_CAR' :  True if ks_CAR == 0 else False,
-            'Th_universal' : ks4_Th_universal,
-            'Th_learned' : ks4_Th_learned,
-            'duplicate_spike_bins' : ks4_duplicate_spike_bins,
-            'nblocks' : ks_nblocks,
-            'sig_interp' : 20.0,
-            'whitening_range' : ks_whiteningRange,
-            'min_template_size' : ks4_min_template_size_um,
-            'template_sizes' : 5,
-            'template_from_data' : True,
-            'tmin' : 0,
-            'tmax' : np.inf,
-            'neareast_chans' : 10,
-            'nearest_templates' : 100,
-            'ccg_threshold' : 0.25,
-            'acg_threshold' : 0.20,
-            'ks_make_copy': ks_make_copy,
             'save_extra_vars' : include_pcs,    # to save Wall and pc features
-            'doFilter' : ks_doFilter,       # not yet used
-            'templateSeed' : ks_LTseed      # not yet used
+            'doFilter' : ks_doFilter,        # not yet used
+            'ks_make_copy': ks_make_copy,
+            'save_preprocessed_copy' : bool(ks_copy_fproc),
+            # ks4_params are limited to members of the KS4 'settings' list
+            'ks4_params' : {           
+                    'Th_universal' : ks4_Th_universal,
+                    'Th_learned' : ks4_Th_learned,  
+                    'duplicate_spike_ms' : ks4_duplicate_spike_ms,
+                    'nblocks' : ks_nblocks,
+                    'sig_interp' : 20.0,
+                    'whitening_range' : ks_whiteningRange,
+                    'min_template_size' : ks4_min_template_size_um,
+                    'template_sizes' : 5,
+                    'templates_from_data' : True,
+                    'nearest_chans' : 10,
+                    'nearest_templates' : 100,
+                    'ccg_threshold' : 0.25,
+                    'acg_threshold' : 0.20,
+                    'template_seed' : ks_LTseed,
+                    'cluster_seed' : ks_CSBseed,
+            }
     },
         
                       
@@ -401,7 +404,7 @@ def createInputJson(output_file,
             "drift_metrics_interval_s" : 51,
             "drift_metrics_min_spikes_per_interval" : 10,
             "include_pcs" : include_pcs,
-            "include_ibl" : False
+            "include_ibl" : True
         },
         
         "catGT_helper_params" : {

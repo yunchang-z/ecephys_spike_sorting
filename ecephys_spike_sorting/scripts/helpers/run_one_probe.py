@@ -4,7 +4,6 @@ import subprocess
 import sys
 from helpers import log_from_json
 
-
 # Given json files for CatGT and modules, all processing unique to this 
 # recording session and probe
 
