@@ -35,7 +35,7 @@ def _get_ks_params(meta_file, settings_from_json, b_seed):
     settings = DEFAULT_SETTINGS    
     settings['n_chan_bin'] = int(probe_meta.get('nSavedChans'))
     settings['fs'] = float(probe_meta.get('imSampRate')) # sample rate
-    # all other user setting coming from the json, and 
+    # all other user setting coming from the json
     settings = {**settings, **settings_from_json}
     if settings['tmax'] < 0:
         settings['tmax'] = np.inf

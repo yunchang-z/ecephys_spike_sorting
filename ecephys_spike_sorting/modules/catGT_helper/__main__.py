@@ -33,7 +33,7 @@ def run_CatGT(args):
     # common average referencing
     car_mode = args['catGT_helper_params']['car_mode']
     if car_mode == 'loccar':
-        if ['catGT_helper_params']['useGeom']:
+        if args['catGT_helper_params']['useGeom']:
             inner_um = args['catGT_helper_params']['loccar_inner_um']
             outer_um = args['catGT_helper_params']['loccar_outer_um']
             car_str = ' -loccar_um=' + repr(inner_um) + ',' + repr(outer_um)

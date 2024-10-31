@@ -140,7 +140,7 @@ ks_nblocks = 6      # for KS2.5 KS3, and KS4; 1 for rigid registration in drift 
 # -------------------------------------------------------
 # KS4 specific parameters -- these are the default values
 # -------------------------------------------------------
-ks4_duplicate_spike_bins = 15
+ks4_duplicate_spike_ms = 0.25
 ks4_min_template_size_um = 10
 
 # If running KS20_for_preprocessed_data:
@@ -389,7 +389,7 @@ for spec in run_specs:
                                        event_ex_param_str = event_ex_param_str,
                                        c_Waves_snr_um = c_Waves_snr_um,                               
                                        qm_isi_thresh = refPerMS/1000,
-                                       ks4_duplicate_spike_bins = ks4_duplicate_spike_bins,
+                                       ks4_duplicate_spike_ms = ks4_duplicate_spike_ms,
                                        ks4_min_template_size_um = ks4_min_template_size_um
                                        )   
 
