@@ -72,7 +72,14 @@ def run_CatGT(args):
     # print('cmd_parts')
 
     catGT_cmd = ' '        # use space as the separator for the command parts
-    catGT_cmd = catGT_cmd.join(cmd_parts)
+    catGT_cmd = catGT_cmd.join(cmd_parts[1:len(cmd_parts)]) # these are the parameters
+    if os_str=='linux':
+        # enclose the params in single quotes, so curly braces will not be interpreted by Linux
+        catGT_cmd = f"{cmd_parts[0]} '{catGT_cmd}'"
+    else:
+        catGT_cmd = f"{cmd_parts[0]} {catGT_cmd}"
+    
+    
     
     print('CatGT command line:' + catGT_cmd)
     
