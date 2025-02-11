@@ -312,20 +312,27 @@ def load_kilosort_data(folder,
     channel_map = load(folder, 'channel_map.npy')
     channel_pos = load(folder, 'channel_positions.npy')
 
-    if include_pcs:
+    # pc and template features files were not created by some versions of KS.
+    # skip if absent, or caller has specfied include_pcs=False
+    if include_pcs and os.path.isfile(os.path.join(folder, 'pc_features.npy')):
         pc_features = load(folder, 'pc_features.npy')
+    else:
+        pc_features = np.asarray([])
+    if include_pcs and os.path.isfile(os.path.join(folder, 'pc_feature_ind.npy')):
         pc_feature_ind = load(folder, 'pc_feature_ind.npy')
-        if os.path.isfile(os.path.join(folder, 'template_features.npy')):
-            template_features = load(folder, 'template_features.npy') 
-        else:
-            template_features = np.asarray([])
+    else:
+        pc_feature_ind = np.asarray([])
+    if include_pcs and os.path.isfile(os.path.join(folder, 'template_features.npy')):
+        template_features = load(folder, 'template_features.npy') 
+    else:
+        template_features = np.asarray([])
 
     # fix any nans in templates
     if np.sum(np.isnan(templates)):
         templates = np.nan_to_num(templates)
         np.save(os.path.join(folder,'templates.npy'),templates)
     
-     # zero padding differs between sort versions, so derive from the
+    # zero padding differs between sort versions, so derive from the
     # values in the templates
     s1 = np.nansum(templates,axis=0)
     s2 = np.nansum(s1,axis=1)
@@ -363,18 +370,13 @@ def load_kilosort_data(folder,
         pad = np.zeros((diff,))
         cluster_amplitude = np.append(cluster_amplitude,pad)
         
-
-        
-        
-
     if not include_pcs:
         return spike_times, spike_clusters, spike_templates, amplitudes, unwhitened_temps, \
-               channel_map, channel_pos, cluster_ids, cluster_quality, cluster_amplitude
+                   channel_map, channel_pos, cluster_ids, cluster_quality, cluster_amplitude                 
     else:
         return spike_times, spike_clusters, spike_templates, amplitudes, unwhitened_temps, \
-               channel_map, channel_pos, cluster_ids, cluster_quality, cluster_amplitude, \
-               pc_features, pc_feature_ind, template_features
-
+           channel_map, channel_pos, cluster_ids, cluster_quality, cluster_amplitude, \
+           pc_features, pc_feature_ind, template_features
 
 def get_spike_depths(spike_clusters, unit_template_ids, first_pc_sq, pc_feature_ind, channel_pos):
 

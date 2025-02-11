@@ -73,7 +73,7 @@ def calculate_ibl_metrics(spike_times, spike_clusters, amplitudes, params, sampl
         nc_pass = calculate_noise_cutoff(np.squeeze(amplitudes[in_epoch]), spike_clusters[in_epoch], total_units)
                 
         metrics = pd.concat((metrics, pd.DataFrame(data= OrderedDict((('cluster_id', cluster_ids),
-                                ('slideingRP' , SRP_pass),
+                                ('slidingRP' , SRP_pass),
                                 ('nongauss_noise_cutoff' , nc_pass),                                
                                 )))))
 

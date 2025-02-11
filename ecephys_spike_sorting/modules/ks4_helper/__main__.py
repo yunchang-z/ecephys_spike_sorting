@@ -179,8 +179,14 @@ def run_ks4(args):
     chanmap_file = os.path.join(ks_output_dir, chanmap_filename)
     # generate chanMap file
     MetaToCoords(metaFullPath=meta_file, outType=1,
-                 destFullPath=str(chanmap_file))
+                 destFullPath=str(chanmap_file))[3]
 
+    # unlike KS2.5 and KS3, the channel_map.npy written by KS4 (and used
+    # internally during the sort) refers to the original binary, rather
+    # than indexing into a temporary file. See kilosort\io.py remove_bad_channels
+    # and kilosort\io.py save_to_phy.
+
+    
     # make a copy of the chanMap file to the binary directory; serves as a record
     # simplfies re-running the sorter outside of the pipeline.
     shutil.copy(chanmap_file, os.path.join(input_file.parent, chanmap_filename))

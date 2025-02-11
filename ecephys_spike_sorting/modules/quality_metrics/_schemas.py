@@ -16,7 +16,7 @@ class QualityMetricsParams(DefaultSchema):
 
     drift_metrics_min_spikes_per_interval = Int(required=False, default=10, help='Minimum number of spikes for computing depth')
     drift_metrics_interval_s = Float(required=False, default=100, help='Interval length is seconds for computing spike depth')
-    include_pcs = Boolean(required=False, default=True, help='Set to false if features were not saved with Phy output')
+    include_pc_metrics = Boolean(required=False, default=True, help='Set to false if features were not saved with Phy output')
     include_ibl = Boolean(required=False, default=True, help='Set to false if features were not saved with Phy output')
 
 class InputParameters(ArgSchema):

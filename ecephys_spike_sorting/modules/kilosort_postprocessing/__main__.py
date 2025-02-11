@@ -1,12 +1,11 @@
 from argschema import ArgSchemaParser
 import os
 import logging
-import subprocess
 import time
 
 import numpy as np
 
-from ...common.utils import load_kilosort_data, getSortResults
+from ...common.utils import load_kilosort_data
 
 from .postprocessing import remove_double_counted_spikes
 from .postprocessing import align_spike_times
@@ -22,28 +21,15 @@ def run_postprocessing(args):
 
     start = time.time()
     
-    include_pcs = args['ks_postprocessing_params']['include_pcs']
-    
-    if include_pcs:
-        spike_times, spike_clusters, spike_templates, amplitudes, templates, channel_map, \
-        channel_pos, clusterIDs, cluster_quality, cluster_amplitude, pc_features, pc_feature_ind, template_features = \
-                    load_kilosort_data(args['directories']['kilosort_output_directory'], \
-                        args['ephys_params']['sample_rate'], \
-                        convert_to_seconds = False, \
-                        use_master_clock = False, \
-                        include_pcs = include_pcs )
-    else:
-        spike_times, spike_clusters, spike_templates, amplitudes, templates, channel_map, \
-        channel_pos, clusterIDs, cluster_quality, cluster_amplitude = \
-                    load_kilosort_data(args['directories']['kilosort_output_directory'], \
-                        args['ephys_params']['sample_rate'], \
-                        convert_to_seconds = False, \
-                        use_master_clock = False, \
-                        include_pcs = include_pcs )
-        # empty arrays to stand in for the missing variables
-        pc_features = np.asarray([])
-        pc_feature_ind = np.asarray([])
-        template_features = np.asarray([])
+       
+    spike_times, spike_clusters, spike_templates, amplitudes, templates, channel_map, \
+    channel_pos, clusterIDs, cluster_quality, cluster_amplitude, pc_features, pc_feature_ind, template_features = \
+                load_kilosort_data(args['directories']['kilosort_output_directory'], \
+                    args['ephys_params']['sample_rate'], \
+                    convert_to_seconds = False, \
+                    use_master_clock = False, \
+                    include_pcs = True )
+
         
     if args['ks_postprocessing_params']['align_avg_waveform']: 
         spike_times = align_spike_times(spike_times,
@@ -79,10 +65,10 @@ def run_postprocessing(args):
     np.save(os.path.join(output_dir, 'spike_clusters.npy'), spike_clusters)    
     np.save(os.path.join(output_dir, 'spike_templates.npy'), spike_templates)
     
-    if args['ks_postprocessing_params']['include_pcs']:
+    if pc_features.size > 0:
         np.save(os.path.join(output_dir, 'pc_features.npy'), pc_features)
-        if template_features.size > 0: 
-            np.save(os.path.join(output_dir, 'template_features.npy'), template_features)
+    if template_features.size > 0: 
+        np.save(os.path.join(output_dir, 'template_features.npy'), template_features)
     
     if args['ks_postprocessing_params']['remove_duplicates']:
         np.save(os.path.join(output_dir, 'overlap_matrix.npy'), overlap_matrix)

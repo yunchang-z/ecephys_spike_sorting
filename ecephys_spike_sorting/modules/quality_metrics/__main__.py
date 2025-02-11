@@ -22,7 +22,7 @@ def calculate_quality_metrics(args):
 
     start = time.time()
     
-    include_pcs = args['quality_metrics_params']['include_pcs']
+    include_pc_metrics = args['quality_metrics_params']['include_pc_metrics']
     
     # make usre we can write an output file
     
@@ -36,20 +36,20 @@ def calculate_quality_metrics(args):
 
 
     try:
-        if include_pcs:
+        if include_pc_metrics:
             spike_times, spike_clusters, spike_templates, amplitudes, templates, channel_map, \
             channel_pos, clusterIDs, cluster_quality, cluster_amplitude, pc_features, pc_feature_ind, template_features = \
                     load_kilosort_data(args['directories']['kilosort_output_directory'], \
                         args['ephys_params']['sample_rate'], \
                         use_master_clock = False,
-                        include_pcs = include_pcs)
+                        include_pcs = True)
         else:
             spike_times, spike_clusters, spike_templates, amplitudes, templates, channel_map, \
             channel_pos, clusterIDs, cluster_quality, cluster_amplitude = \
             load_kilosort_data(args['directories']['kilosort_output_directory'], \
                         args['ephys_params']['sample_rate'], \
                         use_master_clock = False,
-                        include_pcs = include_pcs)
+                        include_pcs = False)
             pc_features = []
             pc_feature_ind = []
                     

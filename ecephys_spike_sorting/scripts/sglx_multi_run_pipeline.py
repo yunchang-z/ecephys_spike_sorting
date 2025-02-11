@@ -24,7 +24,7 @@ from create_input_json import createInputJson
 # create_input_json; in the module list, call 'kilosort helper'
 # To run KS4, use an anaconda install and call 'ks4_helper'
 
-ks_ver = '2.5'  # needs to be one of: '2.0', '2.5', '3.0', or '4'
+ks_ver = '4'  # needs to be one of: '2.0', '2.5', '3.0', or '4'
 ksTag_dict = {'2.0':'ks2', '2.5':'ks25', '3.0':'ks3', '4':'ks4'}
 ks_output_tag = ksTag_dict[ks_ver]
 
@@ -64,7 +64,7 @@ logName = 'pipeline_test_log.csv'
 
 # Raw data directory = npx_directory
 # run_specs = name, gate, trigger and probes to process
-npx_directory = r'D:\pipeline_test_data'
+npx_directory = r'D:\SC048_in'
 
 # Each run_spec is a list of 4 strings:
 #   undecorated run name (no g/t specifier, the run field in CatGT)
@@ -86,7 +86,7 @@ run_specs = [
 # Set to an existing directory; all output will be written here.
 # Output will be in the standard SpikeGLX directory structure:
 # run_folder/probe_folder/*.bin
-catGT_dest = r'D:\pipeline_test_out'
+catGT_dest = r'D:\SC048_out'
 
 # ------------
 # CatGT params
@@ -179,14 +179,14 @@ toStream_sync_params = 'imec0' # should be ni, imec<probe index>. or obx<obx ind
 # List of modules to run per probe; CatGT and TPrime are called once for each run,
 # and should not be included here.
 modules = [            
-            'kilosort_helper',
+            'ks4_helper',
             'kilosort_postprocessing',
             #'noise_templates',  
             'mean_waveforms',
             'quality_metrics'
 			]
 
-json_directory = r'C:\Users\labadmin\Documents\ecephys_anaconda\ecephys_json'
+json_directory = r'D:\SC048_out\json_files'
 
 # -----------------------
 # -----------------------
@@ -390,7 +390,8 @@ for spec in run_specs:
                                        c_Waves_snr_um = c_Waves_snr_um,                               
                                        qm_isi_thresh = refPerMS/1000,
                                        ks4_duplicate_spike_ms = ks4_duplicate_spike_ms,
-                                       ks4_min_template_size_um = ks4_min_template_size_um
+                                       ks4_min_template_size_um = ks4_min_template_size_um,
+                                       include_pc_metrics = True
                                        )   
 
         # copy json file to data directory as record of the input parameters 

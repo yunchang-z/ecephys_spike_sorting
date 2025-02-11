@@ -19,7 +19,7 @@ from create_input_json import createInputJson
 # -------------------------------
 # Full path to log file, including file name
 # If this file exists, new run data is appended to it
-logFullPath = r'Z:\KS4_test\ws_pipeline_out\pipeline_log.csv'
+logFullPath = r'D:\SC048_out\pipeline_log.csv'
 
 # ks_ver  sets up the output tag and threshold values.
 # To run a specific MATLAB KS, make sure to set up the kilosort_repository in 
@@ -65,7 +65,7 @@ else:
 
 recording_specs = [		
     
-                [r'Z:\KS4_test\SC026_080619_ex_g0_tcat.imec2.ap.bin',['thalamus']]
+                [r'D:\SC048_out\catgt_SC048_122920_ex_g0\SC048_122920_ex_g0_imec2\SC048_122920_ex_g0_tcat.imec2.ap.bin',['cortex']]
 
 ]
 
@@ -79,7 +79,7 @@ recording_specs = [
 # translated into sites using the probe geometry.
 ks_remDup = 0       # used by KS2, 2.5, 3
 ks_saveRez = 1      # used by KS2, 2.5, 3
-ks_copy_fproc = 1   # used by 2.5, 3, to save drift corrected binary
+ks_copy_fproc = 0   # used by 2.5, 3, to save drift corrected binary
 ks_templateRadius_um = 163    # used by KS2, 2.5, 3
 ks_whiteningRadius_um = 163   # used by KS2, 2,5 2.5, 3
 ks_minfr_goodchannels = 0.1   # used by KS2, 2.5, 3; set to 0 for KS2.5 and 3
@@ -123,7 +123,7 @@ modules = [
             'quality_metrics'
 			]
 
-json_directory = r'Z:\KS4_test\ws_pipeline_out\ecephys_json'
+json_directory = r'D:\SC048_out\json_files'
 
 
 # -----------------------
@@ -155,7 +155,7 @@ session_id = []
 data_directory = []
 output_dir = []
 
-kilosort_output_parent = r'Z:\KS4_test\ws_pipeline_out'
+kilosort_output_parent = r'D:\SC048_out\filelist_output'
  
 for i, spec in enumerate(recording_specs):
     
@@ -231,7 +231,7 @@ for i, spec in enumerate(recording_specs):
                                    qm_isi_thresh = refPerMS/1000,
                                    ks4_duplicate_spike_ms = ks4_duplicate_spike_ms,
                                    ks4_min_template_size_um = ks4_min_template_size_um,
-                                   include_pcs = True
+                                   include_pc_metrics = True
                                    
                                    )   
 

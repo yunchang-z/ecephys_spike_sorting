@@ -50,11 +50,11 @@ def run_kilosort(args):
        metaFullPath = Path(metaName + '.meta')
 
        destFullPath = os.path.join(args['kilosort_helper_params']['matlab_home_directory'], 'chanMap.mat')
-       MaskChannels = np.where(mask == False)[0]  
+       MaskChannels = np.where(mask == False)[0]
        print('Indentfied noise channels: ' + repr(MaskChannels))
        connected = MetaToCoords( metaFullPath=metaFullPath, outType=1, badChan=MaskChannels, destFullPath=destFullPath)[3]
        # create channel map to reference the raw data for KS2.5 and KS3
-       chan_map_raw = np.where(connected==1)[0] 
+       chan_map_raw = np.where(connected==1)[0]
        # end of SpikeGLX block
        
     else:
@@ -146,6 +146,10 @@ def run_kilosort(args):
     copy_fproc = args['kilosort_helper_params']['kilosort2_params']['copy_fproc']
   
     if copy_fproc:
+        # assume user wants to view in phy using the drift corrected file 
+        # put path to that file in the params.py file
+        # save copy of the chan_map that refers to the full binary
+        # (including reference and noisy channels)
         fproc_path_str = args['kilosort_helper_params']['kilosort2_params']['fproc']
         # trim quotes off string sent to matlab
         fproc_path = fproc_path_str[1:len(fproc_path_str)-1]
@@ -162,6 +166,11 @@ def run_kilosort(args):
         if args['kilosort_helper_params']['kilosort2_params']['KSver'] in ['2.5', '3.0']:
             np.save(os.path.join(output_dir,'channel_map_raw.npy'), chan_map_raw)
     else:
+        # params.py with refer to the original binary.
+        # save the channel map for the original binary to channel_map.npy
+        # channel_positions.npy is still correct; the channel_map.npy points
+        # phy (and other software) to the correct trace in the original data.
+        # save a copy of chanenel map used with the processed file.
         chan_phy_binary = args['ephys_params']['num_channels']
         fix_phy_params(output_dir, dat_dir, dat_name, chan_phy_binary, args['ephys_params']['sample_rate'])
         # if version = 2.5 or 3.0, make a copy of the existing channel_map.npy file, and write one for 

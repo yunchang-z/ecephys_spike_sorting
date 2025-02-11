@@ -65,7 +65,7 @@ def calculate_metrics(spike_times, spike_clusters, spike_templates, amplitudes, 
 #   define a short epoch for testing
     # epochs = [Epoch('test',0,10)]
     
-    include_pcs = params['include_pcs']
+    include_pc_metrics = params['include_pc_metrics']
     
     
 #   after any curation, the number of templates may not match the number of templates  
@@ -102,7 +102,7 @@ def calculate_metrics(spike_times, spike_clusters, spike_templates, amplitudes, 
         print("Calculating amplitude cutoff")
         amplitude_cutoff = calculate_amplitude_cutoff(spike_clusters[in_epoch], amplitudes[in_epoch], total_units)
         
-        if include_pcs:
+        if include_pc_metrics:
             
             # determine template this is the best match for each cluster id
             # initialize template ids

@@ -69,7 +69,7 @@ def createInputJson(output_file,
                     wm_spread_thresh = 0.12,
                     wm_site_range = 16,
                     qm_isi_thresh = 1.5/1000,
-                    include_pcs = False,
+                    include_pc_metrics = True,
                     ks_nNeighbors_sites_fix = 0,
                     ks4_duplicate_spike_ms = 0.25,
                     ks4_min_template_size_um = 10
@@ -91,7 +91,7 @@ def createInputJson(output_file,
         kilosort_repository = r''  # default path for when we aren't using any of these
             
     npy_matlab_repository = r'C:\Users\colonellj\Documents\npy-matlab-master'
-    catGTPath = r'C:\Users\colonellj\Documents\CatGT-win-44'
+    catGTPath = r'C:\Users\colonellj\Documents\CatGTWinApp\CatGT-win'
     tPrime_path=r'C:\Users\colonellj\Documents\TPrime-win'
     cWaves_path=r'C:\Users\colonellj\Documents\C_Waves-median\C_Waves-win'
          
@@ -101,7 +101,7 @@ def createInputJson(output_file,
     
     # KS 3.0 and 4 do not calculation pc features for phy
     if ks_ver in  ['3.0']:
-        include_pcs = False  # set to false for ks_ver = '3.0'
+        include_pc_metrics = False  # set to false for ks_ver = '3.0'
     
     # derived directory names
     
@@ -333,8 +333,8 @@ def createInputJson(output_file,
         },
                 
         'ks4_helper_params' : {
-            'do_CAR' :  True if ks_CAR == 0 else False,
-            'save_extra_vars' : include_pcs,    # to save Wall and pc features
+            'do_CAR' :  True if ks_CAR == 1 else False,
+            'save_extra_vars' : True,    # to save Wall and pc features
             'doFilter' : ks_doFilter,        # not yet used
             'ks_make_copy': ks_make_copy,
             'save_preprocessed_copy' : bool(ks_copy_fproc),
@@ -366,8 +366,7 @@ def createInputJson(output_file,
             "within_unit_overlap_window" : 0.00017,
             "between_unit_overlap_window" : 0.00041,
             "between_unit_dist_um" : 66,
-            "deletion_mode" : 'lowAmpCluster',
-            "include_pcs" : include_pcs
+            "deletion_mode" : 'lowAmpCluster'
         },
 
         "mean_waveform_params" : {     
@@ -403,7 +402,7 @@ def createInputJson(output_file,
             'n_silhouette' : 10000,
             "drift_metrics_interval_s" : 51,
             "drift_metrics_min_spikes_per_interval" : 10,
-            "include_pcs" : include_pcs,
+            "include_pc_metrics" : include_pc_metrics,
             "include_ibl" : True
         },
         
