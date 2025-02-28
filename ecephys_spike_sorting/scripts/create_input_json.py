@@ -38,6 +38,7 @@ def createInputJson(output_file,
                     catGT_loccar_max_um = 160,
                     catGT_cmd_string = '',
                     catGT_maxZ_um = -1,
+                    catGT_out_tag = 'catgt',
                     noise_template_use_rf = True,
                     event_ex_param_str = '',
                     tPrime_im_ex_list = '',
@@ -434,7 +435,8 @@ def createInputJson(output_file,
                 "toStream_path_3A" : toStream_path_3A,
                 "fromStream_list_3A" : fromStream_list_3A,
                 "psth_ex_str": event_ex_param_str,
-                "sort_out_tag": ks_output_tag
+                "sort_out_tag": ks_output_tag,
+                "catGT_out_tag": catGT_out_tag
         },  
                 
         "psth_events": {

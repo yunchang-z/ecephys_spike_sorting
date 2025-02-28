@@ -17,6 +17,7 @@ class tPrimeParams(DefaultSchema):
     fromStream_list_3A = List(String, required=False, help='list of full paths to fromStream edges files')
     psth_ex_str = String(required=False, help='extract string for events.csv for phy psth')
     sort_out_tag = String(required=False, help='tag for sort output (phy) folder')
+    catGT_out_tag = String(required=False, help='tag catgt output folder; catgt or supercat')
 
 class InputParameters(ArgSchema):
     tPrime_helper_params = Nested(tPrimeParams)

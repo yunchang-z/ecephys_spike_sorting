@@ -35,7 +35,7 @@ def call_TPrime(args):
     first_gate, last_gate = SpikeGLX_utils.ParseGateStr(args['catGT_helper_params']['gate_string'])
     catGT_dest = args['directories']['extracted_data_directory']
     run_name = args['catGT_helper_params']['run_name'] + '_g' + str(first_gate)
-    run_dir_name = 'catgt_' + run_name
+    run_dir_name =  args['tPrime_helper_params']['catGT_out_tag'] + '_' + run_name
     prb_dir_prefix = run_name + '_imec'
     
     run_directory = os.path.join( catGT_dest, run_dir_name ) # extracted edge files for aux data reside in run directory
