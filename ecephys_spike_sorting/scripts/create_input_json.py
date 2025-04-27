@@ -3,7 +3,7 @@ import os, io, json, sys
 
 if sys.platform == 'linux':
     import pwd
-from helpers import SpikeGLX_utils
+from ecephys_spike_sorting.scripts.helpers import SpikeGLX_utils
 
 import numpy as np
 
@@ -19,6 +19,7 @@ def create_samba_directory(samba_server, samba_share):
     return data_dir
 
 def createInputJson(output_file, 
+                    session_name = None,
                     npx_directory=None, 
                     continuous_file = None,
                     spikeGLX_data=True,
@@ -48,7 +49,7 @@ def createInputJson(output_file,
                     tPrime_3A = False,
                     toStream_path_3A = ' ',
                     fromStream_list_3A = list(),
-                    ks_ver = '2.0',
+                    ks_ver = '4',
                     ks_helper_noise_threshold = 20,
                     ks_doFilter = 0,
                     ks_remDup = 0,                   
@@ -64,7 +65,7 @@ def createInputJson(output_file,
                     ks_templateRadius_um = 163,
                     ks_nblocks = 5,
                     ks_CAR = 0,
-                    ks_output_tag = 'ks2',
+                    ks_output_tag = 'ks2', # ???
                     c_Waves_snr_um = 160,
                     wm_spread_thresh = 0.12,
                     wm_site_range = 16,
@@ -72,13 +73,15 @@ def createInputJson(output_file,
                     include_pcs = False,
                     ks_nNeighbors_sites_fix = 0,
                     ks4_duplicate_spike_ms = 0.25,
-                    ks4_min_template_size_um = 10
+                    ks4_min_template_size_um = 10,
+                    supercat_options = None
                     ):
 
     # hard coded paths to code on your computer and system
-    ecephys_directory = r'C:\Users\colonellj\Documents\ecephys_spike_sorting\ecephys_spike_sorting'
+    # ecephys_directory = r'C:\Users\colonellj\Documents\ecephys_spike_sorting\ecephys_spike_sorting'
+    ecephys_directory = r'C:\Users\yz3813\Documents\GitHub\ecephys_spike_sorting\ecephys_spike_sorting'
     
-    # location of kilosort respositories for MATLAB versions.
+    # location of kilosort respositories for MATLAB versions. ???
     # determins what will be run by the kilosort_helper module
     # These ONLY need to be defined if you are going to call them.
     if ks_ver == '2.0':
@@ -90,13 +93,18 @@ def createInputJson(output_file,
     else:
         kilosort_repository = r''  # default path for when we aren't using any of these
             
-    npy_matlab_repository = r'C:\Users\colonellj\Documents\npy-matlab-master'
-    catGTPath = r'C:\Users\colonellj\Documents\CatGT-win-44'
-    tPrime_path=r'C:\Users\colonellj\Documents\TPrime-win'
-    cWaves_path=r'C:\Users\colonellj\Documents\C_Waves-median\C_Waves-win'
+    # npy_matlab_repository = r'C:\Users\colonellj\Documents\npy-matlab-master'
+    # catGTPath = r'C:\Users\colonellj\Documents\CatGT-win-44'
+    # tPrime_path=r'C:\Users\colonellj\Documents\TPrime-win'
+    # cWaves_path=r'C:\Users\colonellj\Documents\C_Waves-median\C_Waves-win'
          
-    # for config files and kilosort working space
-    kilosort_output_tmp = r'D:\kilosort_datatemp' 
+    npy_matlab_repository = r'C:\Users\yz3813\Documents\GitHub\AntibodyMaze_analysis\Maze_phase_2_data_analysis\npy-matlab'
+    catGTPath = r'C:\Users\yz3813\Documents\GitHub\AntibodyMaze_analysis\Maze_phase_2_data_analysis\CatGT-win'
+    tPrime_path=r'C:\Users\yz3813\Documents\GitHub\AntibodyMaze_analysis\Maze_phase_2_data_analysis\TPrime-win'
+    cWaves_path=r'C:\Users\yz3813\Documents\GitHub\AntibodyMaze_analysis\Maze_phase_2_data_analysis\C_Waves-win'
+    
+    # for config files and kilosort working space ???
+    kilosort_output_tmp = r'C:\Users\yz3813\Documents\kilosort_temp' 
     
     
     # KS 3.0 and 4 do not calculation pc features for phy
@@ -121,7 +129,6 @@ def createInputJson(output_file,
     vpitch = 20
     hpitch = 32
     nColumn = 2
-     
     
     if spikeGLX_data:
         # location of the raw data is the continuous file passed from script
@@ -422,6 +429,15 @@ def createInputJson(output_file,
             'useGeom' : useGeom,
             "cmdStr" : catGT_cmd_string,
             "catGTPath" : catGTPath
+        },
+
+        "supercat_helper_params" : {
+            "catGTPath" : catGTPath,
+            "session_name" : session_name,
+            "supercat_options" : supercat_options,
+            "probe_string": probe_string,
+            "stream_string" : catGT_stream_string,
+            "cmdStr" : catGT_cmd_string,
         },
 
         "tPrime_helper_params" : {

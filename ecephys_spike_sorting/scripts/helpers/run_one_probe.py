@@ -2,7 +2,7 @@ import os
 import shutil
 import subprocess
 import sys
-from helpers import log_from_json
+from ecephys_spike_sorting.scripts.helpers import log_from_json
 
 # Given json files for CatGT and modules, all processing unique to this 
 # recording session and probe
@@ -22,11 +22,13 @@ def runOne( session_id,
         command = sys.executable + " -W ignore -m ecephys_spike_sorting.modules." + 'catGT_helper' + " --input_json " + catGT_input_json \
 		          + " --output_json " + catGT_output_json
         print(command)
-        subprocess.check_call(command.split(' '))  
+        subprocess.check_call(command.split(' '))
+        print('CatGT processing complete')  
     
     # if we are running any modules
     # copy module json file to data directory as record of the input parameters 
     if len(modules) > 0:
+        print('Copying module input json to data directory')
         shutil.copy(module_input_json, os.path.join(data_directory, session_id + '-input.json'))
     
     for module in modules:
@@ -35,6 +37,7 @@ def runOne( session_id,
 		          + " --output_json " + output_json
         print(command)
         subprocess.check_call(command.split(' '))
+        print(module + ' processing complete')
         
     log_from_json.addEntry(modules, json_directory, session_id, logFullPath)# -*- coding: utf-8 -*-
 
