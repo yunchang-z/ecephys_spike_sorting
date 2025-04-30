@@ -79,8 +79,6 @@ def run_CatGT(args):
     else:
         catGT_cmd = f"{cmd_parts[0]} {catGT_cmd}"
     
-    
-    
     print('CatGT command line:' + catGT_cmd)
     
     start = time.time()

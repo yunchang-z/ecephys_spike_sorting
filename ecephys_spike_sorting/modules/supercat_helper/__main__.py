@@ -53,9 +53,7 @@ def run_supercat(args):
     else:
         catGT_cmd = f"{cmd_parts[0]} {catGT_cmd}"
     
-    
-    
-    print('CatGT command line for super cat:' + catGT_cmd)
+    print('CatGT command line for supercat:' + catGT_cmd)
     
     start = time.time()
     subprocess.Popen(catGT_cmd,shell='False').wait()
@@ -63,19 +61,31 @@ def run_supercat(args):
     execution_time = time.time() - start
     
     # copy CatGT log file, which will be in the directory with the calling 
-    # python scripte, to the destination directory
+    # python script, to the destination directory
     logPath = os.getcwd()
-    logName = 'CatGT_supercat.log'
+
+    # Print the current directory
+    print("Current working directory:", logPath)
+    # logName = 'CatGT.log'
    
-    catgt_runName = 'supercat_' + args['supercat_helper_params']['session_name'] 
+    # first_gate, last_gate = SpikeGLX_utils.ParseGateStr(args['catGT_helper_params']['gate_string'])
+         
+    # catgt_runName = 'catgt_' + args['catGT_helper_params']['run_name'] + '_g' + str(first_gate)
 
     
-    # build name for log copy
-    catgt_logName = catgt_runName
+    # # build name for log copy
+    # catgt_logName = catgt_runName
+    # if 'ap' in args['catGT_helper_params']['stream_string']:
+    #     prb_title = ParseProbeStr(args['catGT_helper_params']['probe_string'])
+    #     catgt_logName = catgt_logName + '_prb' + prb_title
+    # if 'ni' in args['catGT_helper_params']['stream_string']:
+    #     catgt_logName = catgt_logName + '_ni'
+    # catgt_logName = catgt_logName + '_CatGT.log'
     
-    catgt_runDir = os.path.join(args['directories']['extracted_data_directory'],catgt_runName)
-    shutil.copyfile(os.path.join(logPath,logName), \
-                    os.path.join(catgt_runDir,catgt_logName))
+    
+    # catgt_runDir = os.path.join(args['directories']['extracted_data_directory'],catgt_runName)
+    # shutil.copyfile(os.path.join(logPath,logName), \
+    #                 os.path.join(catgt_runDir,catgt_logName))
     
     print('total time: ' + str(np.around(execution_time,2)) + ' seconds')
     

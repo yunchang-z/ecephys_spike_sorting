@@ -1,0 +1,8 @@
+catGTCmdline=<CatGT -t=cat -prb_fld -ni -ap -prb=0 -xa=0,0,0,1,0,0 -xd=0,0,8,0,500 -xid=0,0,8,1,0 -xid=0,0,8,2,0 -xid=0,0,8,3,0 -xid=0,0,8,4,0 -xid=0,0,8,5,0 -xid=0,0,8,6,0 -xd=0,0,8,7,0 -supercat={Z:/Yunchang_Witten_Cup/AntibodyMaze_project/AntibodyMaze_Phase2_cup/4423/20250419_4423_antibody_maze_C1/CatGT_out,catgt_20250419_4423_C1_2_g0}{Z:/Yunchang_Witten_Cup/AntibodyMaze_project/AntibodyMaze_Phase2_cup/4423/20250419_4423_antibody_maze_C1/CatGT_out,catgt_20250419_4423_C1_g0} -dest=Z:/Yunchang_Witten_Cup/AntibodyMaze_project/AntibodyMaze_Phase2_cup/4423/20250419_4423_antibody_maze_C1/CatGT_out -out_prb_fld>
+catNRuns=0
+fileCreateTime=2025-04-26T22:56:37
+fileCreateTime_original=
+fileName=
+fileSHA1=0
+fileSizeBytes=30064771072
+fileTimeSecs=inf
