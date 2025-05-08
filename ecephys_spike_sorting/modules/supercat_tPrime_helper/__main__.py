@@ -47,6 +47,7 @@ def call_TPrime(args):
     
     # check for presence of an fyi file, indicating run with catgt 3.0 or later
     fyi_path = run_directory.replace('\\', '/') + '/' + run_name + '_all_fyi.txt'
+    print('fyi_path: ' + fyi_path)
     all_fyi_exists = Path(fyi_path).is_file()
     
     if not all_fyi_exists:
