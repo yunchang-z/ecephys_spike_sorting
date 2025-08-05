@@ -79,7 +79,7 @@ def createInputJson(output_file,
 
     # hard coded paths to code on your computer and system
     # ecephys_directory = r'C:\Users\colonellj\Documents\ecephys_spike_sorting\ecephys_spike_sorting'
-    ecephys_directory = r'C:\Users\yz3813\Documents\GitHub\ecephys_spike_sorting\ecephys_spike_sorting'
+    ecephys_directory = r'C:\Users\WittenLab\Documents\GitHub\ecephys_spike_sorting\ecephys_spike_sorting'
     
     # location of kilosort respositories for MATLAB versions. ???
     # determins what will be run by the kilosort_helper module
@@ -98,13 +98,13 @@ def createInputJson(output_file,
     # tPrime_path=r'C:\Users\colonellj\Documents\TPrime-win'
     # cWaves_path=r'C:\Users\colonellj\Documents\C_Waves-median\C_Waves-win'
          
-    npy_matlab_repository = r'C:\Users\yz3813\Documents\GitHub\AntibodyMaze_analysis\Maze_phase_2_data_analysis\npy-matlab'
-    catGTPath = r'C:\Users\yz3813\Documents\GitHub\AntibodyMaze_analysis\Maze_phase_2_data_analysis\CatGT-win'
-    tPrime_path=r'C:\Users\yz3813\Documents\GitHub\AntibodyMaze_analysis\Maze_phase_2_data_analysis\TPrime-win'
-    cWaves_path=r'C:\Users\yz3813\Documents\GitHub\AntibodyMaze_analysis\Maze_phase_2_data_analysis\C_Waves-win'
+    npy_matlab_repository = r'C:\Users\colonellj\Documents\npy-matlab-master'
+    catGTPath = r'C:\Users\WittenLab\Documents\GitHub\AntibodyMaze_analysis\Maze_phase_2_data_analysis\CatGT-win'
+    tPrime_path=r'C:\Users\WittenLab\Documents\GitHub\AntibodyMaze_analysis\Maze_phase_2_data_analysis\TPrime-win'
+    cWaves_path=r'C:\Users\WittenLab\Documents\GitHub\AntibodyMaze_analysis\Maze_phase_2_data_analysis\C_Waves-win'
     
     # for config files and kilosort working space ???
-    kilosort_output_tmp = r'C:\Users\yz3813\Documents\kilosort_temp' 
+    kilosort_output_tmp = r'D:\kilosort_temp'
     
     
     # KS 3.0 and 4 do not calculation pc features for phy
